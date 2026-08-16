@@ -1,0 +1,4 @@
+# Mount the packaged skill provider through the official dsh.bundle patch mechanism.
+- insert:
+    - id: galgame-localization-reverse
+      name: dsh-galgame-localization-reverse

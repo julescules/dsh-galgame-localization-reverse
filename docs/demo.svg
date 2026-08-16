@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Galgame localization workflow for DeepSeek Harness</title>
+  <desc id="desc">Evidence flows from engine detection through extraction, localization, verification, and rollback-safe release.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12172b"/>
+      <stop offset="1" stop-color="#241438"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#65d6ff"/>
+      <stop offset="1" stop-color="#c58cff"/>
+    </linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity=".35"/></filter>
+  </defs>
+  <rect width="1200" height="630" rx="28" fill="url(#bg)"/>
+  <circle cx="1100" cy="70" r="220" fill="#9c6cff" opacity=".08"/>
+  <circle cx="100" cy="590" r="260" fill="#4ddcff" opacity=".07"/>
+  <text x="70" y="94" fill="#f6f4ff" font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="40" font-weight="700">Galgame Localization Reverse</text>
+  <text x="70" y="137" fill="#bdb9d8" font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="21">A packaged Skill Provider for DeepSeek Harness</text>
+  <rect x="70" y="175" width="1060" height="3" fill="url(#accent)" rx="2"/>
+  <g filter="url(#shadow)" font-family="Segoe UI, Noto Sans SC, sans-serif">
+    <g transform="translate(72 235)">
+      <rect width="190" height="132" rx="18" fill="#1d2944" stroke="#59d9ff" stroke-width="2"/>
+      <text x="95" y="48" text-anchor="middle" fill="#68dcff" font-size="18" font-weight="700">01 DETECT</text>
+      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">引擎与格式证据</text>
+      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">25+ engine families</text>
+    </g>
+    <g transform="translate(290 235)">
+      <rect width="190" height="132" rx="18" fill="#20243f" stroke="#71c8ff" stroke-width="2"/>
+      <text x="95" y="48" text-anchor="middle" fill="#78caff" font-size="18" font-weight="700">02 EXTRACT</text>
+      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">文本与资源所有权</text>
+      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">hash-bound inventory</text>
+    </g>
+    <g transform="translate(508 235)">
+      <rect width="190" height="132" rx="18" fill="#25213e" stroke="#948fff" stroke-width="2"/>
+      <text x="95" y="48" text-anchor="middle" fill="#a99bff" font-size="18" font-weight="700">03 LOCALIZE</text>
+      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">编码、UI、字节码</text>
+      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">placeholders preserved</text>
+    </g>
+    <g transform="translate(726 235)">
+      <rect width="190" height="132" rx="18" fill="#29203e" stroke="#bb89ff" stroke-width="2"/>
+      <text x="95" y="48" text-anchor="middle" fill="#c89aff" font-size="18" font-weight="700">04 VERIFY</text>
+      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">静态与运行验证</text>
+      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">save and UI regression</text>
+    </g>
+    <g transform="translate(944 235)">
+      <rect width="190" height="132" rx="18" fill="#30203f" stroke="#db83ff" stroke-width="2"/>
+      <text x="95" y="48" text-anchor="middle" fill="#e291ff" font-size="18" font-weight="700">05 RELEASE</text>
+      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">可回滚发布</text>
+      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">manifest + rollback</text>
+    </g>
+  </g>
+  <g fill="none" stroke="url(#accent)" stroke-width="3" opacity=".8">
+    <path d="M262 301h28"/><path d="M480 301h28"/><path d="M698 301h28"/><path d="M916 301h28"/>
+  </g>
+  <g font-family="Segoe UI, Noto Sans SC, sans-serif">
+    <rect x="72" y="424" width="1062" height="102" rx="18" fill="#171a30" stroke="#474162"/>
+    <text x="103" y="460" fill="#d6d2eb" font-size="17">AI6WIN · BGI/Ethornell · Director · RealLive · Siglus · KiriKiri · Majiro · Yu-Ris · PSP/Vita · Custom VM</text>
+    <text x="103" y="496" fill="#fff" font-size="21" font-weight="600">Originals stay immutable. Every mutation is hash-bound, verified, and reversible.</text>
+  </g>
+  <text x="70" y="581" fill="#9c99b6" font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="16">Unofficial community plugin · No game assets included</text>
+</svg>
