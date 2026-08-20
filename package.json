@@ -1,6 +1,6 @@
 {
   "name": "dsh-galgame-localization-reverse",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Packaged Galgame localization and reverse-engineering skill provider for DeepSeek Harness.",
   "author": "julescules",
   "homepage": "https://github.com/julescules/dsh-galgame-localization-reverse#readme",
@@ -15,7 +15,8 @@
   "main": "index.js",
   "exports": {
     ".": "./index.js",
-    "./provider-core": "./provider-core.js"
+    "./provider-core": "./provider-core.js",
+    "./package.json": "./package.json"
   },
   "files": [
     "index.js",
@@ -38,6 +39,14 @@
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.1-rc.1",
     "@deepseek-ai/dsh-skill": ">=0.0.1-rc.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-skill": {
+      "optional": true
+    }
   },
   "dsh": {
     "bundle": {

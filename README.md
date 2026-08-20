@@ -21,7 +21,7 @@ A packaged DeepSeek Harness skill for evidence-driven Windows galgame and visual
 ## Install
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.1.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.1.1
 dsh --profile web --dump-config
 ```
 
@@ -53,6 +53,7 @@ The repository contains no game assets, decrypted archives, credentials, or titl
 - direct-reference integrity across the skill bundle;
 - Node provider tests plus both Python utility self-tests;
 - package allowlist and public-content scan.
+- real `@deepseek-ai/dsh@0.1.0-rc.8` profile installation and config composition with clean host-peer resolution.
 
 ```powershell
 npm run check

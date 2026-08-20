@@ -21,7 +21,7 @@
 ## 安装
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.1.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.1.1
 dsh --profile web --dump-config
 ```
 
@@ -53,6 +53,7 @@ python -X utf8 skill\scripts\vn_patch.py --selftest
 - Skill 直接引用的参考资料与脚本均存在；
 - Node Provider 测试及两个 Python 工具自测；
 - npm 包文件白名单与公开内容扫描。
+- 已通过真实 `@deepseek-ai/dsh@0.1.0-rc.8` Profile 安装和配置组合，宿主 peer 解析无警告。
 
 ```powershell
 npm run check
