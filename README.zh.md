@@ -16,12 +16,13 @@
 - 保护占位符、控制码、源文件哈希、存档兼容性与回滚路径；
 - 自带 `vn_qa.py`，检查占位符与目标编码；
 - 自带 `vn_patch.py`，生成哈希绑定的替换补丁，并支持验证与回滚；
+- 自带无第三方依赖的 `vn_image_qa.py`，为 PNG/APNG、JPEG、GIF、BMP 建立清单，并比较尺寸、alpha、帧数和哈希；
 - 覆盖 AI6WIN、BGI/Ethornell、Director、RealLive、PSP/Vita 和自定义引擎。
 
 ## 安装
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.1.1
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.2.0
 dsh --profile web --dump-config
 ```
 
@@ -41,6 +42,10 @@ dsh --profile web --dump-config
 ```powershell
 python -X utf8 skill\scripts\vn_qa.py --selftest
 python -X utf8 skill\scripts\vn_patch.py --selftest
+python -X utf8 skill\scripts\vn_image_qa.py --selftest
+
+# 比较原始与汉化后的图片目录。
+python -X utf8 skill\scripts\vn_image_qa.py compare D:\project\original\images D:\project\working\images -o D:\project\logs\image-qa.json
 ```
 
 仓库不包含游戏资源、解密封包、账号凭据或作品专用密钥。公开发布应只包含工具、清单、文档以及差分／替换补丁。
@@ -51,9 +56,9 @@ python -X utf8 skill\scripts\vn_patch.py --selftest
 - 官方 `dsh.bundle.patch` 安装入口；
 - YAML frontmatter 去除与 `resourceBase` 解析；
 - Skill 直接引用的参考资料与脚本均存在；
-- Node Provider 测试及两个 Python 工具自测；
+- Node Provider 测试及三个 Python 工具自测；
 - npm 包文件白名单与公开内容扫描。
-- 已通过真实 `@deepseek-ai/dsh@0.1.0-rc.8` Profile 安装和配置组合，宿主 peer 解析无警告。
+- 已通过真实 `@deepseek-ai/dsh@0.1.1-rc.2` Profile 安装和配置组合，宿主 peer 解析无警告。
 
 ```powershell
 npm run check
