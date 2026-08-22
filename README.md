@@ -16,12 +16,13 @@ A packaged DeepSeek Harness skill for evidence-driven Windows galgame and visual
 - preserves placeholders, control codes, source hashes, save compatibility, and rollback paths;
 - includes `vn_qa.py` for placeholder/encoding gates;
 - includes `vn_patch.py` for hash-bound file replacement, verification, and rollback;
+- includes dependency-free `vn_image_qa.py` for PNG/APNG, JPEG, GIF, and BMP inventory plus geometry, alpha, frame-count, and hash comparison;
 - covers AI6WIN, BGI/Ethornell, Director, RealLive, PSP/Vita workflows, and custom engines.
 
 ## Install
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.1.1
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.2.0
 dsh --profile web --dump-config
 ```
 
@@ -41,6 +42,10 @@ and propose a reversible localization workflow for D:\Games\Example.
 ```powershell
 python -X utf8 skill\scripts\vn_qa.py --selftest
 python -X utf8 skill\scripts\vn_patch.py --selftest
+python -X utf8 skill\scripts\vn_image_qa.py --selftest
+
+# Compare original and localized raster trees.
+python -X utf8 skill\scripts\vn_image_qa.py compare D:\project\original\images D:\project\working\images -o D:\project\logs\image-qa.json
 ```
 
 The repository contains no game assets, decrypted archives, credentials, or title-specific keys. Public releases should contain tooling, manifests, documentation, and differential or replacement patches only.
@@ -51,9 +56,9 @@ The repository contains no game assets, decrypted archives, credentials, or titl
 - official `dsh.bundle.patch` install path;
 - frontmatter removal and resource-base resolution;
 - direct-reference integrity across the skill bundle;
-- Node provider tests plus both Python utility self-tests;
+- Node provider tests plus all three Python utility self-tests;
 - package allowlist and public-content scan.
-- real `@deepseek-ai/dsh@0.1.0-rc.8` profile installation and config composition with clean host-peer resolution.
+- real `@deepseek-ai/dsh@0.1.1-rc.2` profile installation and config composition with clean host-peer resolution.
 
 ```powershell
 npm run check
