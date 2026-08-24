@@ -1,7 +1,7 @@
 {
   "name": "dsh-galgame-localization-reverse",
-  "version": "0.3.0",
-  "description": "Packaged Galgame localization and reverse-engineering skill provider for DeepSeek Harness.",
+  "version": "0.4.0",
+  "description": "One-command Galgame engine detection, translation QA, and reversible patch audit for DeepSeek Harness.",
   "author": "julescules",
   "homepage": "https://github.com/julescules/dsh-galgame-localization-reverse#readme",
   "repository": {
@@ -23,14 +23,17 @@
     "provider-core.js",
     "cordis.patch.yml",
     "skill",
+    "examples",
     "README.md",
     "README.zh.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
     "docs/demo.svg",
     "LICENSE"
   ],
   "scripts": {
     "test": "node --test",
-    "check": "node --check index.js && node --check provider-core.js && npm test && python -X utf8 skill/scripts/vn_qa.py --selftest && python -X utf8 skill/scripts/vn_patch.py --selftest && python -X utf8 skill/scripts/vn_image_qa.py --selftest && python -X utf8 skill/scripts/vn_slot_qa.py --selftest",
+    "check": "node --check index.js && node --check provider-core.js && npm test && python -X utf8 skill/scripts/vn_project_audit.py --selftest && python -X utf8 skill/scripts/vn_qa.py --selftest && python -X utf8 skill/scripts/vn_patch.py --selftest && python -X utf8 skill/scripts/vn_image_qa.py --selftest && python -X utf8 skill/scripts/vn_slot_qa.py --selftest",
     "pack:dry": "npm pack --dry-run"
   },
   "engines": {
@@ -58,6 +61,10 @@
     "deepseek-harness",
     "galgame",
     "visual-novel",
+    "translation-qa",
+    "game-localization",
+    "renpy",
+    "kirikiri",
     "localization",
     "reverse-engineering",
     "windows",
