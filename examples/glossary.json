@@ -1,0 +1,15 @@
+{
+  "terms": [
+    {
+      "source": "名前",
+      "targets": ["名字", "姓名"]
+    },
+    {
+      "source": "先輩",
+      "target": "学姐"
+    }
+  ],
+  "forbidden": [
+    "未翻译"
+  ]
+}

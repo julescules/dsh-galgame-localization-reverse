@@ -2,6 +2,8 @@
 
 中文 | [English](README.md)
 
+[![dshbase verified](https://img.shields.io/badge/dshbase-verified-16a34a)](https://dshbase.com/zh/plugins/dsh-galgame-localization-reverse/) [![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
+
 > [!IMPORTANT]
 > 非官方社区插件，由社区独立开发与维护，未经 DeepSeek 审核或背书。
 
@@ -12,7 +14,7 @@
 ## 30 秒开始
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.4.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.5.0
 ```
 
 重启 DSH，然后直接说：
@@ -26,31 +28,46 @@ dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#
 
 ## 能得到什么
 
-### 一条命令完成项目体检
+### 一条命令生成汉化计划
 
-`vn_project_audit.py` 在受限范围内盘点文件，并报告：
+`vn_project_audit.py plan` 在受限范围内盘点文件，并报告：
 
 - 带置信度、信号组和实际相对路径证据的引擎候选；
 - 剧本、封包、图片、字体和可执行文件候选；
 - 有上限的编码抽样，以及安全显示的中文／日文路径；
 - 谨慎的 `candidate`、`weak-candidate` 或 `unknown` 分类；
-- 下一步应查阅的参考、可复用的社区工具和验证动作。
+- 证据状态、推荐路线、准确的下一条命令、风险和发布门禁。
 
 分类只用于选择路线，不代表静态检查已经证明运行时行为。
 
 ```powershell
-python -X utf8 skill\scripts\vn_project_audit.py scan D:\Games\Example `
+python -X utf8 skill\scripts\vn_project_audit.py plan D:\Games\Example `
   --json D:\project\logs\project-audit.json `
   --markdown D:\project\logs\project-audit.md
 ```
 
+### 可往返的源脚本适配器
+
+`vn_script_adapter.py` 将普通 KiriKiri `.ks`、Ren'Py `.rpy` 和 NScripter `0.txt` 文本提取为 UTF-8 JSONL，同时保存源文本哈希、整行哈希、路径、行号、编码、BOM、换行、前缀和后缀。回注始终写入独立输出目录；原文发生变化时 fail closed。
+
+```powershell
+python -X utf8 skill\scripts\vn_script_adapter.py extract D:\Games\Example `
+  --engine kirikiri --output D:\project\translations.jsonl
+
+python -X utf8 skill\scripts\vn_script_adapter.py apply D:\Games\Example `
+  D:\project\translations.jsonl --output-root D:\project\rebuilt
+```
+
+它不会打开 XP3/NSA 封包，也不宣称支持编译剧本。
+
 ### 严格翻译门禁
 
-`vn_qa.py` 现在默认阻断控制标记缺失、新增或重排，并检查空译、译文与原文相同、残留日文及目标编码失败。无需第三方包即可读取通用 JSON/JSONL 和 GalTransl 缓存字段。
+`vn_qa.py` 默认阻断控制标记缺失、新增或重排。v3 新增术语表、禁用词、重复原文译法一致性、字符/行数预算、标点配对、空译、残留日文和目标编码检查。无需第三方包即可读取通用 JSON/JSONL、脚本适配器 JSONL 和 GalTransl 缓存字段。
 
 ```powershell
 python -X utf8 skill\scripts\vn_qa.py check-jsonl D:\project\translations.jsonl `
-  --encoding gbk --require-complete `
+  --encoding gbk --require-complete --require-consistent `
+  --glossary D:\project\glossary.json --max-chars 80 --max-lines 3 --check-punctuation `
   --report D:\project\logs\translation-qa.json `
   --markdown D:\project\logs\translation-qa.md
 ```
@@ -77,12 +94,12 @@ GalTransl、VNTextPatch、GARbro、LunaTranslator 和引擎专用工具负责翻
 ## 运行合成样例
 
 ```powershell
-python -X utf8 skill\scripts\vn_project_audit.py scan examples\synthetic-project\game `
+python -X utf8 skill\scripts\vn_project_audit.py plan examples\synthetic-project\game `
   --json test_outputs\synthetic-audit.json `
   --markdown test_outputs\synthetic-audit.md
 
 python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
-  --encoding gbk --require-complete `
+  --encoding gbk --require-complete --glossary examples\glossary.json `
   --report test_outputs\translation-qa.json `
   --markdown test_outputs\translation-qa.md
 ```
@@ -102,18 +119,19 @@ python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
 
 ## 验证包
 
-[![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
-
 ```powershell
 npm run check
 npm pack --dry-run
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.5.0.tgz .\builds\v0.5.0
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.5.0.tgz -ChecksumsPath .\builds\v0.5.0\SHA256SUMS
 ```
 
-检查包含 Provider 测试，以及项目体检和全部 QA／补丁工具的确定性自测。
+检查包含 Provider 测试，以及计划生成、脚本适配、翻译 QA 和全部补丁／资源工具的确定性自测。每个 Release 还会发布 SHA-256 与 CycloneDX SBOM 证据。
 
 ## 边界
 
 - 引擎格式和二进制常量在绑定具体版本哈希前都只是候选。
+- 脚本适配器只支持普通源文件，不代表封包或编译剧本已经兼容。
 - 静态体检与 QA 不能代替零变更回注和实际 UI、存读档、音频、回滚测试。
 - 残留日文可能是有意保留项；应逐条审阅或维护明确排除表，不能静默放宽门禁。
 - DeepSeek Harness 尚处于开发预览阶段，请固定到已审阅的插件版本。

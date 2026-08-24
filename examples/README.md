@@ -5,14 +5,25 @@ These files are original, minimal fixtures. They contain no commercial game asse
 From the repository root:
 
 ```powershell
-python -X utf8 skill\scripts\vn_project_audit.py scan examples\synthetic-project\game `
+python -X utf8 skill\scripts\vn_project_audit.py plan examples\synthetic-project\game `
   --json test_outputs\synthetic-audit.json `
   --markdown test_outputs\synthetic-audit.md
 
 python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
-  --encoding gbk --require-complete `
+  --encoding gbk --require-complete --glossary examples\glossary.json `
   --report test_outputs\translation-qa.json `
   --markdown test_outputs\translation-qa.md
+```
+
+Extract the source-script fixtures without touching them:
+
+```powershell
+python -X utf8 skill\scripts\vn_script_adapter.py extract examples\synthetic-project\game `
+  --engine kirikiri --output test_outputs\kirikiri.jsonl
+python -X utf8 skill\scripts\vn_script_adapter.py extract examples\script-adapters\renpy `
+  --engine renpy --output test_outputs\renpy.jsonl
+python -X utf8 skill\scripts\vn_script_adapter.py extract examples\script-adapters\nscripter `
+  --engine nscripter --output test_outputs\nscripter.jsonl
 ```
 
 The project scan should identify KiriKiri as an evidence-backed candidate. The translation fixture intentionally fails: one record adds a control tag and another is empty. It is useful for testing CI failure output and report rendering.

@@ -2,6 +2,8 @@
 
 [中文](README.zh.md) | English
 
+[![dshbase verified](https://img.shields.io/badge/dshbase-verified-16a34a)](https://dshbase.com/plugins/dsh-galgame-localization-reverse/) [![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
+
 > [!IMPORTANT]
 > Unofficial community plugin. Independently developed and maintained; not reviewed or endorsed by DeepSeek.
 
@@ -12,7 +14,7 @@ Audit first, localize second. Give DeepSeek Harness a visual-novel folder and ge
 ## Start in 30 seconds
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.4.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.5.0
 ```
 
 Restart DSH, then ask:
@@ -26,31 +28,46 @@ No API key is required. The plugin contains no game assets, decrypted archives, 
 
 ## What you get
 
-### One-command project audit
+### One-command localization plan
 
-`vn_project_audit.py` inventories a bounded set of files and reports:
+`vn_project_audit.py plan` inventories a bounded set of files and reports:
 
 - engine candidates with confidence, signal groups, and concrete path evidence;
 - script, archive, image, font, and executable candidates;
 - bounded encoding samples and CJK-path-safe relative paths;
 - a cautious classification of `candidate`, `weak-candidate`, or `unknown`;
-- the reference, existing ecosystem tool, and verification step to try next.
+- an evidence status, recommended route, exact next commands, risks, and release gates.
 
 The classification is routing evidence, not a claim that static inspection proves runtime behavior.
 
 ```powershell
-python -X utf8 skill\scripts\vn_project_audit.py scan D:\Games\Example `
+python -X utf8 skill\scripts\vn_project_audit.py plan D:\Games\Example `
   --json D:\project\logs\project-audit.json `
   --markdown D:\project\logs\project-audit.md
 ```
 
+### Lossless source-script adapters
+
+`vn_script_adapter.py` extracts plain KiriKiri `.ks`, Ren'Py `.rpy`, and NScripter `0.txt` text into UTF-8 JSONL while preserving source hash, line hash, path, line number, encoding, BOM, newline, prefix, and suffix. Apply always writes to a separate output root and fails if the source changed.
+
+```powershell
+python -X utf8 skill\scripts\vn_script_adapter.py extract D:\Games\Example `
+  --engine kirikiri --output D:\project\translations.jsonl
+
+python -X utf8 skill\scripts\vn_script_adapter.py apply D:\Games\Example `
+  D:\project\translations.jsonl --output-root D:\project\rebuilt
+```
+
+It does not open XP3/NSA archives or claim compiled-script support.
+
 ### Strict translation preflight
 
-`vn_qa.py` now rejects missing, added, or reordered control tokens by default. It also reports empty translations, source-identical targets, residual Japanese, and target-encoding failures. Generic JSON/JSONL and GalTransl cache fields are supported without third-party packages.
+`vn_qa.py` rejects missing, added, or reordered control tokens by default. v3 adds glossary and forbidden-term gates, repeated-source consistency, character/line budgets, punctuation balance, empty translations, residual Japanese, and target-encoding checks. Generic JSON/JSONL, script-adapter JSONL, and GalTransl cache fields are supported without third-party packages.
 
 ```powershell
 python -X utf8 skill\scripts\vn_qa.py check-jsonl D:\project\translations.jsonl `
-  --encoding gbk --require-complete `
+  --encoding gbk --require-complete --require-consistent `
+  --glossary D:\project\glossary.json --max-chars 80 --max-lines 3 --check-punctuation `
   --report D:\project\logs\translation-qa.json `
   --markdown D:\project\logs\translation-qa.md
 ```
@@ -77,12 +94,12 @@ GalTransl, VNTextPatch, GARbro, LunaTranslator, and engine-specific tools can ha
 ## Try the synthetic examples
 
 ```powershell
-python -X utf8 skill\scripts\vn_project_audit.py scan examples\synthetic-project\game `
+python -X utf8 skill\scripts\vn_project_audit.py plan examples\synthetic-project\game `
   --json test_outputs\synthetic-audit.json `
   --markdown test_outputs\synthetic-audit.md
 
 python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
-  --encoding gbk --require-complete `
+  --encoding gbk --require-complete --glossary examples\glossary.json `
   --report test_outputs\translation-qa.json `
   --markdown test_outputs\translation-qa.md
 ```
@@ -102,18 +119,19 @@ The registered name remains `galgame-localization-reverse`, so existing prompts 
 
 ## Verify the package
 
-[![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
-
 ```powershell
 npm run check
 npm pack --dry-run
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.5.0.tgz .\builds\v0.5.0
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.5.0.tgz -ChecksumsPath .\builds\v0.5.0\SHA256SUMS
 ```
 
-The check runs provider tests plus deterministic self-tests for the project audit and all bundled QA/patch utilities.
+The check runs provider tests plus deterministic self-tests for planning, script adapters, translation QA, and all bundled patch/asset utilities. Each release also publishes SHA-256 and CycloneDX SBOM evidence.
 
 ## Limits
 
 - Engine formats and binary constants remain title/version specific until proven against exact hashes.
+- Script adapters support plain source files only and never imply archive/compiled-script compatibility.
 - Static audit and QA do not replace a zero-mutation round trip or in-game UI, save/load, audio, and rollback tests.
 - Residual Japanese can be intentional; review each finding or maintain an explicit exclusion instead of silently weakening the gate.
 - DeepSeek Harness is in developer preview; pin a reviewed plugin release.

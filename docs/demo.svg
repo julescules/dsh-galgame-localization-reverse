@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Galgame Doctor synthetic terminal report</title>
-  <desc id="desc">A terminal-style synthetic example showing a read-only KiriKiri project audit followed by strict translation QA that catches an added control tag and an empty translation.</desc>
+  <desc id="desc">A terminal-style synthetic example showing an evidence-backed KiriKiri localization plan, lossless script adapter, and terminology QA.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#08111f"/>
@@ -31,12 +31,12 @@
     <circle cx="87" cy="181" r="6" fill="#ff6b77"/>
     <circle cx="108" cy="181" r="6" fill="#ffcc67"/>
     <circle cx="129" cy="181" r="6" fill="#55df9b"/>
-    <text x="600" y="187" text-anchor="middle" fill="#8d8aa3" font-family="Cascadia Mono, Consolas, monospace" font-size="14">PowerShell · read-only reports</text>
+    <text x="600" y="187" text-anchor="middle" fill="#8d8aa3" font-family="Cascadia Mono, Consolas, monospace" font-size="14">PowerShell · plan → extract → QA</text>
   </g>
 
   <g font-family="Cascadia Mono, Consolas, monospace" font-size="17">
     <text x="88" y="239" fill="#70e0ff">PS&gt;</text>
-    <text x="130" y="239" fill="#e8e6f0">vn_project_audit.py scan D:\Games\Example</text>
+    <text x="130" y="239" fill="#e8e6f0">vn_project_audit.py plan D:\Games\Example</text>
     <text x="88" y="271" fill="#68e4ad">READ-ONLY</text>
     <text x="210" y="271" fill="#9491a8">input files changed: 0</text>
     <text x="88" y="303" fill="#f4f2fa">ENGINE</text>
@@ -44,23 +44,23 @@
     <text x="290" y="303" fill="#f4f2fa">KiriKiri · confidence 0.76</text>
     <text x="88" y="335" fill="#8f8ca3">evidence</text>
     <text x="183" y="335" fill="#c8c5d2">startup.tjs · scenario/*.ks · 2 signal groups</text>
-    <text x="88" y="367" fill="#8f8ca3">next</text>
-    <text x="183" y="367" fill="#c8c5d2">prove a zero-mutation script round trip</text>
+    <text x="88" y="367" fill="#8f8ca3">route</text>
+    <text x="183" y="367" fill="#c8c5d2">lossless .ks adapter · source tree stays immutable</text>
 
     <line x1="88" y1="393" x2="1112" y2="393" stroke="#2c2940"/>
 
     <text x="88" y="431" fill="#70e0ff">PS&gt;</text>
-    <text x="130" y="431" fill="#e8e6f0">vn_qa.py check-jsonl translations.jsonl --require-complete</text>
+    <text x="130" y="431" fill="#e8e6f0">vn_qa.py check translations.jsonl --glossary glossary.json</text>
     <text x="88" y="463" fill="#ff7582" font-weight="700">FAIL</text>
-    <text x="151" y="463" fill="#9491a8">2 blockers · 3 segments · machine-readable evidence</text>
-    <text x="88" y="495" fill="#ff8b96">E control-token-added</text>
-    <text x="335" y="495" fill="#c8c5d2">scene01:2 · added [wait]</text>
-    <text x="88" y="527" fill="#ff8b96">E empty-translation</text>
-    <text x="335" y="527" fill="#c8c5d2">scene01:3 · translation required</text>
+    <text x="151" y="463" fill="#9491a8">2 blockers · glossary + layout + control tokens</text>
+    <text x="88" y="495" fill="#ff8b96">E terminology-mismatch</text>
+    <text x="355" y="495" fill="#c8c5d2">scene01.ks:2 · 先輩 → 学姐</text>
+    <text x="88" y="527" fill="#ff8b96">E character-budget</text>
+    <text x="355" y="527" fill="#c8c5d2">scene01.ks:3 · 92 / 80 characters</text>
   </g>
 
   <g font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="15">
-    <text x="60" y="602" fill="#9793aa">Offline · no API key · input tree is never modified · JSON + Markdown reports</text>
-    <text x="1140" y="602" text-anchor="end" fill="#777389">DeepSeek Harness community plugin</text>
+    <text x="60" y="602" fill="#9793aa">Offline · no API key · KiriKiri / Ren'Py / NScripter source adapters</text>
+    <text x="1140" y="602" text-anchor="end" fill="#777389">dshbase verified</text>
   </g>
 </svg>

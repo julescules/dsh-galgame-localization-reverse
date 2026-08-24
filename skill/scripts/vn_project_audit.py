@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-SCHEMA_VERSION = "vn-project-audit/v1"
+SCHEMA_VERSION = "vn-project-audit/v2"
 SCRIPT_EXTENSIONS = {".ks", ".tjs", ".rpy", ".rpyc", ".txt", ".scn", ".mes", ".mjo", ".ss", ".json"}
 ARCHIVE_EXTENSIONS = {".xp3", ".nsa", ".ns2", ".sar", ".arc", ".pfs", ".pac", ".dat", ".cpk"}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp", ".g00", ".gxt", ".akb", ".cbg"}
@@ -81,6 +81,12 @@ ENGINE_RULES = (
         ("runtime", ("nw.dll", "package.json")),
     )),
 )
+
+ADAPTER_ENGINES = {
+    "KiriKiri": ("kirikiri", "*.ks"),
+    "Ren'Py": ("renpy", "*.rpy"),
+    "NScripter/ONScripter": ("nscripter", "0.txt"),
+}
 
 
 def _norm(value: str) -> str:
@@ -234,7 +240,7 @@ def build_report(root: Path, *, max_files: int = 20000, max_encoding_samples: in
         next_step = "Evidence is insufficient: collect a second independent signal group before choosing an extractor."
     else:
         next_step = "No supported engine candidate was found; inspect executable imports, archive magic, and runtime ownership manually."
-    return {
+    report = {
         "schema": SCHEMA_VERSION,
         "mode": "read-only",
         "root": str(root_resolved),
@@ -248,6 +254,49 @@ def build_report(root: Path, *, max_files: int = 20000, max_encoding_samples: in
             "Static paths are routing evidence, not proof of runtime engine ownership.",
             "Encoding probes only report strict decodability of bounded byte samples.",
             "Archives are not opened and game resources are not uploaded or modified.",
+        ],
+    }
+    report["localization_plan"] = build_localization_plan(report)
+    return report
+
+
+def build_localization_plan(report: dict[str, Any]) -> dict[str, Any]:
+    candidates = report.get("engine_candidates", [])
+    top = candidates[0] if candidates else None
+    engine = top["engine"] if top else "Unknown"
+    proven = bool(top and top["classification"] == "candidate")
+    commands = [
+        "python -X utf8 skill/scripts/vn_project_audit.py scan <GAME_DIR> --json <REPORT_DIR>/audit.json --markdown <REPORT_DIR>/audit.md",
+    ]
+    route = "Collect a second independent engine signal before extraction."
+    if engine in ADAPTER_ENGINES:
+        adapter, pattern = ADAPTER_ENGINES[engine]
+        route = f"Use the lossless {engine} source-script adapter for {pattern}; archives and compiled scripts stay out of scope."
+        commands.extend([
+            f"python -X utf8 skill/scripts/vn_script_adapter.py extract <GAME_DIR> --engine {adapter} --output <PROJECT_DIR>/translations.jsonl",
+            "python -X utf8 skill/scripts/vn_qa.py check <PROJECT_DIR>/translations.jsonl --require-complete --glossary <PROJECT_DIR>/glossary.json --report <REPORT_DIR>/translation-qa.json",
+            "python -X utf8 skill/scripts/vn_script_adapter.py apply <GAME_DIR> <PROJECT_DIR>/translations.jsonl --output-root <PROJECT_DIR>/rebuilt",
+        ])
+    elif top:
+        route = top["tool_hint"]
+    return {
+        "schema": "vn-localization-plan/v1",
+        "mode": "advisory-read-only",
+        "engine": engine,
+        "evidence_status": "candidate-with-two-signal-groups" if proven else "insufficient-static-evidence",
+        "route": route,
+        "commands": commands,
+        "release_gates": [
+            "zero-mutation extraction/rebuild proof",
+            "strict control-token and terminology QA",
+            "target-encoding and font/UI capacity check",
+            "runtime UI plus save/load/audio smoke test",
+            "hash-bound install and rollback verification",
+        ],
+        "risks": [
+            "Static engine evidence is not runtime ownership proof.",
+            "Compiled or encrypted scripts need an engine-specific round trip before translation.",
+            "Any source, font, image, or runtime change invalidates downstream release evidence.",
         ],
     }
 
@@ -287,6 +336,11 @@ def render_markdown(report: dict[str, Any]) -> str:
     if report["warnings"]:
         lines.extend(["", "## Scan warnings", ""])
         lines.extend(f"- {item}" for item in report["warnings"])
+    plan = report["localization_plan"]
+    lines.extend(["", "## Localization plan", "", f"- Engine: **{plan['engine']}**", f"- Evidence: `{plan['evidence_status']}`", f"- Route: {plan['route']}", "", "### Suggested commands", ""])
+    lines.extend(f"- `{item}`" for item in plan["commands"])
+    lines.extend(["", "### Release gates", ""])
+    lines.extend(f"- {item}" for item in plan["release_gates"])
     return "\n".join(lines) + "\n"
 
 
@@ -313,6 +367,9 @@ def _selftest() -> int:
     weak = detect_engines(["startup.tjs"])
     assert weak[0]["classification"] == "weak-candidate", weak
     assert detect_engines(["readme.md"]) == []
+    synthetic = {"engine_candidates": candidates}
+    plan = build_localization_plan(synthetic)
+    assert plan["engine"] == "KiriKiri" and "vn_script_adapter.py extract" in " ".join(plan["commands"]), plan
     print("selftest OK")
     return 0
 
@@ -321,17 +378,18 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="Read-only Galgame project evidence audit.")
     parser.add_argument("--selftest", action="store_true")
     sub = parser.add_subparsers(dest="command")
-    scan = sub.add_parser("scan", help="scan one game directory without modifying it")
-    scan.add_argument("root")
-    scan.add_argument("--json", dest="json_path", help="write JSON report")
-    scan.add_argument("--markdown", help="write Markdown report")
-    scan.add_argument("--max-files", type=int, default=20000)
-    scan.add_argument("--max-encoding-samples", type=int, default=20)
-    scan.add_argument("--sample-bytes", type=int, default=65536)
+    for name in ("scan", "plan"):
+        scan = sub.add_parser(name, help="scan one game directory and produce evidence plus an advisory localization plan")
+        scan.add_argument("root")
+        scan.add_argument("--json", dest="json_path", help="write JSON report")
+        scan.add_argument("--markdown", help="write Markdown report")
+        scan.add_argument("--max-files", type=int, default=20000)
+        scan.add_argument("--max-encoding-samples", type=int, default=20)
+        scan.add_argument("--sample-bytes", type=int, default=65536)
     args = parser.parse_args(argv)
     if args.selftest:
         return _selftest()
-    if args.command != "scan":
+    if args.command not in {"scan", "plan"}:
         parser.print_help()
         return 2
     root = Path(args.root).resolve(strict=True)
