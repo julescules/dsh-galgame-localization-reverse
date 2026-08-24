@@ -8,12 +8,12 @@ const RESOURCE_BASE = {
   path: fileURLToPath(new URL('./skill/', import.meta.url)),
 }
 const INVOCATION = { modelInvocable: true, userInvocable: true }
-const DESCRIPTION = 'Windows galgame and visual-novel localization engineering: engine detection, encoding-safe text and UI work, bytecode round trips, save compatibility, reversible patches, portable releases, and evidence-driven rollback.'
+const DESCRIPTION = 'Galgame Doctor for Windows visual novels: one-command project inspection, strict translation QA, engine evidence, encoding checks, and reversible patch release guidance.'
 
 export const candidate = {
   name: 'galgame-localization-reverse',
   description: DESCRIPTION,
-  whenToUse: 'Use for Windows visual-novel engine identification, localization, resource rebuilding, runtime compatibility, save-safe patching, release QA, and rollback planning.',
+  whenToUse: 'Use when a user wants to inspect a Galgame directory, identify its engine, audit translated text, diagnose encoding or UI risks, or build and verify a reversible localization patch.',
   invocation: INVOCATION,
   provider: PROVIDER_NAME,
   source: 'bundled',

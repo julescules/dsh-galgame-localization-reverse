@@ -30,14 +30,24 @@ test('Cordis apply registers the provider factory', () => {
 test('all direct skill references and scripts exist', async () => {
   const body = await readFile(candidate.path, 'utf8')
   const links = [...body.matchAll(/`((?:references|scripts)\/[A-Za-z0-9._/-]+)`/g)].map(match => match[1])
-  assert.ok(links.length >= 10)
+  assert.ok(links.length >= 12)
   for (const link of new Set(links)) await access(new URL(`../skill/${link}`, import.meta.url))
 })
 
 test('package metadata supports DSH profile inventory without installing duplicate host peers', async () => {
   const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
-  assert.equal(pkg.version, '0.3.0')
+  assert.equal(pkg.version, '0.4.0')
   assert.equal(pkg.exports['./package.json'], './package.json')
+  assert.ok(pkg.files.includes('examples'))
   assert.equal(pkg.peerDependenciesMeta['@deepseek-ai/cordis'].optional, true)
   assert.equal(pkg.peerDependenciesMeta['@deepseek-ai/dsh-skill'].optional, true)
+})
+
+test('Galgame Doctor entry points are packaged and discoverable', async () => {
+  await access(new URL('../skill/scripts/vn_project_audit.py', import.meta.url))
+  await access(new URL('../skill/scripts/vn_qa.py', import.meta.url))
+  await access(new URL('../examples/synthetic-project/game/startup.tjs', import.meta.url))
+  await access(new URL('../examples/translations.jsonl', import.meta.url))
+  assert.match(candidate.description, /Galgame Doctor/)
+  assert.match(candidate.whenToUse, /inspect a Galgame directory/)
 })
