@@ -1,0 +1,33 @@
+name: Engine or QA adapter request
+description: Propose a reproducible engine signature, source-script adapter, or translation QA rule.
+title: "[Engine/QA] "
+labels: [engine-request]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Request type
+      options: [Engine evidence, Source-script adapter, Translation QA rule, Runtime acceptance recipe]
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Reproducible evidence
+      description: Provide synthetic/minimal paths, magic bytes, script grammar, or QA examples. Do not upload commercial game assets.
+    validations:
+      required: true
+  - type: textarea
+    id: roundtrip
+    attributes:
+      label: Expected round-trip and rollback proof
+      description: Explain what must remain byte-identical and how failure should stop safely.
+    validations:
+      required: true
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Submission boundary
+      options:
+        - label: The report contains no commercial assets, title keys, credentials, or personal data.
+          required: true

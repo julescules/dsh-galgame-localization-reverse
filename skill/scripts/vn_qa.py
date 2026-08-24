@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-SCHEMA_VERSION = "vn-translation-qa/v2"
+SCHEMA_VERSION = "vn-translation-qa/v3"
 PLACEHOLDER_PATTERNS = [
     r"\{\{[0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2})?\}\}",
     r"%[0-9]+\$[-+ #0]*[0-9]*(?:\.[0-9]+)?[diouxXeEfgGcspn%]",
@@ -24,6 +24,7 @@ PLACEHOLDER_PATTERNS = [
 _PH_RE = re.compile("|".join(f"(?:{item})" for item in PLACEHOLDER_PATTERNS))
 _JAPANESE_RE = re.compile(r"[\u3040-\u30ff]")
 _ZERO_WIDTH_RE = re.compile("[\u200b\u200c\u200d\ufeff]")
+_PUNCTUATION_PAIRS = (("“", "”"), ("「", "」"), ("『", "』"), ("（", "）"), ("(", ")"))
 
 
 def extract_placeholders(text: str) -> list[str]:
@@ -107,6 +108,45 @@ def _string(value: Any) -> str:
     return value if isinstance(value, str) else ""
 
 
+def load_glossary(path_value: str | None) -> dict[str, Any]:
+    if not path_value:
+        return {"terms": [], "forbidden": []}
+    with Path(path_value).open("r", encoding="utf-8-sig") as handle:
+        value = json.load(handle)
+    if not isinstance(value, dict) or not isinstance(value.get("terms", []), list) or not isinstance(value.get("forbidden", []), list):
+        raise ValueError("glossary must be an object containing terms[] and optional forbidden[]")
+    terms = []
+    for index, item in enumerate(value.get("terms", []), 1):
+        if not isinstance(item, dict) or not isinstance(item.get("source"), str) or not item["source"]:
+            raise ValueError(f"glossary term {index} needs a non-empty source")
+        targets = item.get("targets", item.get("target", []))
+        if isinstance(targets, str):
+            targets = [targets]
+        if not isinstance(targets, list) or not all(isinstance(target, str) and target for target in targets):
+            raise ValueError(f"glossary term {index} needs target or targets")
+        terms.append({"source": item["source"], "targets": targets})
+    forbidden = value.get("forbidden", [])
+    if not all(isinstance(item, str) and item for item in forbidden):
+        raise ValueError("glossary forbidden entries must be non-empty strings")
+    return {"terms": terms, "forbidden": forbidden}
+
+
+def _punctuation_issues(text: str) -> list[dict[str, Any]]:
+    issues = []
+    for opening, closing in _PUNCTUATION_PAIRS:
+        if text.count(opening) != text.count(closing):
+            issues.append({"code": "punctuation-unbalanced", "message": f"unbalanced punctuation pair {opening}{closing}", "pair": opening + closing})
+    return issues
+
+
+def _append_record_issue(rows: list[dict[str, Any]], record_id: Any, issue: dict[str, Any]) -> None:
+    existing = next((row for row in rows if row["segment_id"] == record_id), None)
+    if existing:
+        existing["issues"].append(issue)
+    else:
+        rows.append({"segment_id": record_id, "issues": [issue]})
+
+
 def adapt_record(record: dict[str, Any], index: int, *, input_format: str, source_field: str, target_field: str, id_field: str) -> tuple[str, str, Any]:
     selected = input_format
     if selected == "auto":
@@ -132,12 +172,23 @@ def check_records(
     source_field: str = "source",
     target_field: str = "target",
     id_field: str = "segment_id",
+    glossary: dict[str, Any] | None = None,
+    require_consistent: bool = False,
+    max_chars: int | None = None,
+    max_lines: int | None = None,
+    check_punctuation: bool = False,
 ) -> dict[str, Any]:
+    if max_chars is not None and max_chars < 1:
+        raise ValueError("max_chars must be positive")
+    if max_lines is not None and max_lines < 1:
+        raise ValueError("max_lines must be positive")
     failures: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
     counts: Counter[str] = Counter()
     total = 0
     completed = 0
+    glossary = glossary or {"terms": [], "forbidden": []}
+    translations_by_source: dict[str, list[tuple[Any, str]]] = {}
     for index, record in enumerate(records, 1):
         total += 1
         src, tgt, record_id = adapt_record(record, index, input_format=input_format, source_field=source_field, target_field=target_field, id_field=id_field)
@@ -149,6 +200,8 @@ def check_records(
             (issues if require_complete else advisory).append(item)
         else:
             completed += 1
+            if src.strip():
+                translations_by_source.setdefault(src.strip(), []).append((record_id, tgt.strip()))
             placeholders = verify_placeholders(src, tgt, allow_added=allow_added, allow_reordered=allow_reordered)
             if placeholders["missing"]:
                 issues.append({"code": "control-token-missing", "message": "source control tokens are missing", "tokens": placeholders["missing"]})
@@ -177,10 +230,37 @@ def check_records(
             if zero_width:
                 issues.append({"code": "zero-width-character", "message": "target contains invisible zero-width characters", "codepoints": [f"U+{ord(item):04X}" for item in zero_width]})
                 counts["zero_width_character"] += 1
+            if max_chars is not None and len(strip_placeholders(tgt).replace("\r", "").replace("\n", "")) > max_chars:
+                issues.append({"code": "character-budget", "message": f"target exceeds max_chars={max_chars}", "actual": len(strip_placeholders(tgt).replace("\r", "").replace("\n", ""))})
+                counts["character_budget"] += 1
+            if max_lines is not None and len(tgt.splitlines() or [tgt]) > max_lines:
+                issues.append({"code": "line-budget", "message": f"target exceeds max_lines={max_lines}", "actual": len(tgt.splitlines())})
+                counts["line_budget"] += 1
+            if check_punctuation:
+                punctuation = _punctuation_issues(strip_placeholders(tgt))
+                advisory.extend(punctuation)
+                counts["punctuation_unbalanced"] += len(punctuation)
+            for term in glossary["terms"]:
+                if term["source"] in src and not any(target in tgt for target in term["targets"]):
+                    issues.append({"code": "terminology-mismatch", "message": f"required term translation missing for {term['source']}", "allowed": term["targets"]})
+                    counts["terminology_mismatch"] += 1
+            for forbidden in glossary["forbidden"]:
+                if forbidden in tgt:
+                    issues.append({"code": "forbidden-term", "message": f"target contains forbidden term {forbidden}"})
+                    counts["forbidden_term"] += 1
         if issues:
             failures.append({"segment_id": record_id, "issues": issues})
         if advisory:
             warnings.append({"segment_id": record_id, "issues": advisory})
+    for source, values in translations_by_source.items():
+        unique = sorted({target for _, target in values})
+        if len(unique) < 2:
+            continue
+        counts["inconsistent_translation"] += 1
+        issue = {"code": "inconsistent-translation", "message": "the same source has multiple target translations", "targets": unique[:10], "source_sha256": __import__("hashlib").sha256(source.encode("utf-8")).hexdigest()}
+        destination = failures if require_consistent else warnings
+        for record_id, _ in values:
+            _append_record_issue(destination, record_id, dict(issue))
     return {
         "schema": SCHEMA_VERSION,
         "gate": "FAIL" if failures else "PASS",
@@ -198,6 +278,12 @@ def check_records(
             "reject_japanese": reject_japanese,
             "require_translated": require_translated,
             "encoding": encoding,
+            "glossary_terms": len(glossary["terms"]),
+            "forbidden_terms": len(glossary["forbidden"]),
+            "require_consistent": require_consistent,
+            "max_chars": max_chars,
+            "max_lines": max_lines,
+            "check_punctuation": check_punctuation,
         },
         "failures": failures,
         "warnings": warnings,
@@ -225,14 +311,15 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.extend(["## Blockers", ""])
         for failure in report["failures"]:
             for issue in failure["issues"]:
-                detail = issue.get("tokens") or issue.get("characters") or issue.get("codepoints") or ""
+                detail = issue.get("tokens") or issue.get("characters") or issue.get("codepoints") or issue.get("targets") or issue.get("allowed") or issue.get("pair") or issue.get("actual") or ""
                 lines.append(f"- `{failure['segment_id']}` **{issue['code']}** — {issue['message']}{f' — `{detail}`' if detail else ''}")
         lines.append("")
     if report["warnings"]:
         lines.extend(["## Review warnings", ""])
         for warning in report["warnings"]:
             for issue in warning["issues"]:
-                lines.append(f"- `{warning['segment_id']}` **{issue['code']}** — {issue['message']}")
+                detail = issue.get("targets") or issue.get("pair") or issue.get("actual") or ""
+                lines.append(f"- `{warning['segment_id']}` **{issue['code']}** — {issue['message']}{f' — `{detail}`' if detail else ''}")
         lines.append("")
     lines.extend(["## Policy", "", "```json", json.dumps(report["policy"], ensure_ascii=False, indent=2), "```", ""])
     return "\n".join(lines)
@@ -263,6 +350,11 @@ def _selftest() -> int:
     assert report["gate"] == "FAIL" and report["pending"] == 1 and report["failed_records"] == 2, report
     gal = check_records([{"index": 7, "pre_jp": "名前 %s", "proofread_zh": "名字 %s"}], input_format="galtransl")
     assert gal["gate"] == "PASS", gal
+    enhanced = check_records([
+        {"segment_id": "a", "source": "名前", "target": "名字"},
+        {"segment_id": "b", "source": "名前", "target": "姓名"},
+    ], glossary={"terms": [{"source": "名前", "targets": ["名字"]}], "forbidden": []}, require_consistent=True)
+    assert enhanced["gate"] == "FAIL" and enhanced["counts"]["inconsistent_translation"] == 1 and enhanced["counts"]["terminology_mismatch"] == 1, enhanced
     print("selftest OK")
     return 0
 
@@ -289,6 +381,11 @@ def main(argv: list[str]) -> int:
         check.add_argument("--require-translated", action="store_true")
         check.add_argument("--allow-added", action="store_true")
         check.add_argument("--allow-reordered", action="store_true")
+        check.add_argument("--glossary", help="UTF-8 JSON glossary with terms[] and optional forbidden[]")
+        check.add_argument("--require-consistent", action="store_true")
+        check.add_argument("--max-chars", type=int)
+        check.add_argument("--max-lines", type=int)
+        check.add_argument("--check-punctuation", action="store_true")
         check.add_argument("--report", help="write JSON report")
         check.add_argument("--markdown", help="write Markdown report")
     args = parser.parse_args(argv)
@@ -314,6 +411,11 @@ def main(argv: list[str]) -> int:
             source_field=args.source_field,
             target_field=args.target_field,
             id_field=args.id_field,
+            glossary=load_glossary(args.glossary),
+            require_consistent=args.require_consistent,
+            max_chars=args.max_chars,
+            max_lines=args.max_lines,
+            check_punctuation=args.check_punctuation,
         )
         if args.report:
             _write(args.report, json.dumps(report, ensure_ascii=False, indent=2) + "\n")

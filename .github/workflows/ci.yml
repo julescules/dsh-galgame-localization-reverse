@@ -22,3 +22,9 @@ jobs:
         run: npm run check
       - name: Inspect the packed file allowlist
         run: npm pack --dry-run
+      - name: Build release metadata
+        shell: pwsh
+        run: |
+          $package = (npm pack --silent).Trim()
+          node scripts/build-release-metadata.mjs $package builds/ci
+          ./scripts/verify-release.ps1 -PackagePath $package -ChecksumsPath builds/ci/SHA256SUMS
