@@ -1,62 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">Galgame localization workflow for DeepSeek Harness</title>
-  <desc id="desc">Evidence flows from engine detection through extraction, localization, verification, and rollback-safe release.</desc>
+  <title id="title">Galgame Doctor synthetic terminal report</title>
+  <desc id="desc">A terminal-style synthetic example showing a read-only KiriKiri project audit followed by strict translation QA that catches an added control tag and an empty translation.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#12172b"/>
-      <stop offset="1" stop-color="#241438"/>
+      <stop offset="0" stop-color="#08111f"/>
+      <stop offset="1" stop-color="#161129"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#65d6ff"/>
-      <stop offset="1" stop-color="#c58cff"/>
+      <stop offset="0" stop-color="#58e1ff"/>
+      <stop offset="1" stop-color="#c184ff"/>
     </linearGradient>
-    <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity=".35"/></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-opacity=".38"/></filter>
   </defs>
   <rect width="1200" height="630" rx="28" fill="url(#bg)"/>
-  <circle cx="1100" cy="70" r="220" fill="#9c6cff" opacity=".08"/>
-  <circle cx="100" cy="590" r="260" fill="#4ddcff" opacity=".07"/>
-  <text x="70" y="94" fill="#f6f4ff" font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="40" font-weight="700">Galgame Localization Reverse</text>
-  <text x="70" y="137" fill="#bdb9d8" font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="21">A packaged Skill Provider for DeepSeek Harness</text>
-  <rect x="70" y="175" width="1060" height="3" fill="url(#accent)" rx="2"/>
-  <g filter="url(#shadow)" font-family="Segoe UI, Noto Sans SC, sans-serif">
-    <g transform="translate(72 235)">
-      <rect width="190" height="132" rx="18" fill="#1d2944" stroke="#59d9ff" stroke-width="2"/>
-      <text x="95" y="48" text-anchor="middle" fill="#68dcff" font-size="18" font-weight="700">01 DETECT</text>
-      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">引擎与格式证据</text>
-      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">25+ engine families</text>
-    </g>
-    <g transform="translate(290 235)">
-      <rect width="190" height="132" rx="18" fill="#20243f" stroke="#71c8ff" stroke-width="2"/>
-      <text x="95" y="48" text-anchor="middle" fill="#78caff" font-size="18" font-weight="700">02 EXTRACT</text>
-      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">文本与资源所有权</text>
-      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">hash-bound inventory</text>
-    </g>
-    <g transform="translate(508 235)">
-      <rect width="190" height="132" rx="18" fill="#25213e" stroke="#948fff" stroke-width="2"/>
-      <text x="95" y="48" text-anchor="middle" fill="#a99bff" font-size="18" font-weight="700">03 LOCALIZE</text>
-      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">编码、UI、字节码</text>
-      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">placeholders preserved</text>
-    </g>
-    <g transform="translate(726 235)">
-      <rect width="190" height="132" rx="18" fill="#29203e" stroke="#bb89ff" stroke-width="2"/>
-      <text x="95" y="48" text-anchor="middle" fill="#c89aff" font-size="18" font-weight="700">04 VERIFY</text>
-      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">静态与运行验证</text>
-      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">save and UI regression</text>
-    </g>
-    <g transform="translate(944 235)">
-      <rect width="190" height="132" rx="18" fill="#30203f" stroke="#db83ff" stroke-width="2"/>
-      <text x="95" y="48" text-anchor="middle" fill="#e291ff" font-size="18" font-weight="700">05 RELEASE</text>
-      <text x="95" y="82" text-anchor="middle" fill="#fff" font-size="22">可回滚发布</text>
-      <text x="95" y="108" text-anchor="middle" fill="#aaa9c5" font-size="15">manifest + rollback</text>
-    </g>
-  </g>
-  <g fill="none" stroke="url(#accent)" stroke-width="3" opacity=".8">
-    <path d="M262 301h28"/><path d="M480 301h28"/><path d="M698 301h28"/><path d="M916 301h28"/>
-  </g>
+  <circle cx="1110" cy="70" r="230" fill="#9e6cff" opacity=".08"/>
+  <circle cx="90" cy="600" r="270" fill="#42d9ff" opacity=".06"/>
+
   <g font-family="Segoe UI, Noto Sans SC, sans-serif">
-    <rect x="72" y="424" width="1062" height="102" rx="18" fill="#171a30" stroke="#474162"/>
-    <text x="103" y="460" fill="#d6d2eb" font-size="17">AI6WIN · BGI/Ethornell · Director · RealLive · Siglus · KiriKiri · Majiro · Yu-Ris · PSP/Vita · Custom VM</text>
-    <text x="103" y="496" fill="#fff" font-size="21" font-weight="600">Originals stay immutable. Every mutation is hash-bound, verified, and reversible.</text>
+    <text x="60" y="70" fill="#f7f5ff" font-size="38" font-weight="700">Galgame Doctor</text>
+    <text x="60" y="106" fill="#bdb8d5" font-size="19">Audit first, localize second · 先体检，再汉化</text>
+    <rect x="60" y="128" width="1080" height="3" rx="2" fill="url(#accent)"/>
+    <rect x="950" y="54" width="190" height="42" rx="21" fill="#152a35" stroke="#4ee3ad"/>
+    <text x="1045" y="81" text-anchor="middle" fill="#69e8bd" font-size="15" font-weight="700">SYNTHETIC EXAMPLE</text>
   </g>
-  <text x="70" y="581" fill="#9c99b6" font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="16">Unofficial community plugin · No game assets included</text>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="160" width="1080" height="405" rx="18" fill="#090d17" stroke="#34304a" stroke-width="2"/>
+    <rect x="60" y="160" width="1080" height="42" rx="18" fill="#171b2a"/>
+    <rect x="60" y="184" width="1080" height="18" fill="#171b2a"/>
+    <circle cx="87" cy="181" r="6" fill="#ff6b77"/>
+    <circle cx="108" cy="181" r="6" fill="#ffcc67"/>
+    <circle cx="129" cy="181" r="6" fill="#55df9b"/>
+    <text x="600" y="187" text-anchor="middle" fill="#8d8aa3" font-family="Cascadia Mono, Consolas, monospace" font-size="14">PowerShell · read-only reports</text>
+  </g>
+
+  <g font-family="Cascadia Mono, Consolas, monospace" font-size="17">
+    <text x="88" y="239" fill="#70e0ff">PS&gt;</text>
+    <text x="130" y="239" fill="#e8e6f0">vn_project_audit.py scan D:\Games\Example</text>
+    <text x="88" y="271" fill="#68e4ad">READ-ONLY</text>
+    <text x="210" y="271" fill="#9491a8">input files changed: 0</text>
+    <text x="88" y="303" fill="#f4f2fa">ENGINE</text>
+    <text x="183" y="303" fill="#ffd36b">candidate</text>
+    <text x="290" y="303" fill="#f4f2fa">KiriKiri · confidence 0.76</text>
+    <text x="88" y="335" fill="#8f8ca3">evidence</text>
+    <text x="183" y="335" fill="#c8c5d2">startup.tjs · scenario/*.ks · 2 signal groups</text>
+    <text x="88" y="367" fill="#8f8ca3">next</text>
+    <text x="183" y="367" fill="#c8c5d2">prove a zero-mutation script round trip</text>
+
+    <line x1="88" y1="393" x2="1112" y2="393" stroke="#2c2940"/>
+
+    <text x="88" y="431" fill="#70e0ff">PS&gt;</text>
+    <text x="130" y="431" fill="#e8e6f0">vn_qa.py check-jsonl translations.jsonl --require-complete</text>
+    <text x="88" y="463" fill="#ff7582" font-weight="700">FAIL</text>
+    <text x="151" y="463" fill="#9491a8">2 blockers · 3 segments · machine-readable evidence</text>
+    <text x="88" y="495" fill="#ff8b96">E control-token-added</text>
+    <text x="335" y="495" fill="#c8c5d2">scene01:2 · added [wait]</text>
+    <text x="88" y="527" fill="#ff8b96">E empty-translation</text>
+    <text x="335" y="527" fill="#c8c5d2">scene01:3 · translation required</text>
+  </g>
+
+  <g font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="15">
+    <text x="60" y="602" fill="#9793aa">Offline · no API key · input tree is never modified · JSON + Markdown reports</text>
+    <text x="1140" y="602" text-anchor="end" fill="#777389">DeepSeek Harness community plugin</text>
+  </g>
 </svg>

@@ -1,0 +1,18 @@
+[
+  {
+    "index": 1,
+    "name": "ミズキ",
+    "pre_jp": "こんにちは。",
+    "post_jp": "こんにちは。",
+    "pre_zh": "你好。",
+    "proofread_zh": "你好。"
+  },
+  {
+    "index": 2,
+    "name": "ミズキ",
+    "pre_jp": "また明日。",
+    "post_jp": "また明日。",
+    "pre_zh": "",
+    "proofread_zh": ""
+  }
+]
