@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Galgame Doctor synthetic terminal report</title>
-  <desc id="desc">A terminal-style synthetic example showing an evidence-backed KiriKiri localization plan, lossless script adapter, and terminology QA.</desc>
+  <desc id="desc">A terminal-style synthetic example showing an evidence-backed KiriKiri localization plan and safe translation-memory migration.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#08111f"/>
@@ -18,7 +18,7 @@
 
   <g font-family="Segoe UI, Noto Sans SC, sans-serif">
     <text x="60" y="70" fill="#f7f5ff" font-size="38" font-weight="700">Galgame Doctor</text>
-    <text x="60" y="106" fill="#bdb8d5" font-size="19">Audit first, localize second · 先体检，再汉化</text>
+    <text x="60" y="106" fill="#bdb8d5" font-size="19">Audit, reuse safely, localize · 体检、安全复用、汉化</text>
     <rect x="60" y="128" width="1080" height="3" rx="2" fill="url(#accent)"/>
     <rect x="950" y="54" width="190" height="42" rx="21" fill="#152a35" stroke="#4ee3ad"/>
     <text x="1045" y="81" text-anchor="middle" fill="#69e8bd" font-size="15" font-weight="700">SYNTHETIC EXAMPLE</text>
@@ -31,7 +31,7 @@
     <circle cx="87" cy="181" r="6" fill="#ff6b77"/>
     <circle cx="108" cy="181" r="6" fill="#ffcc67"/>
     <circle cx="129" cy="181" r="6" fill="#55df9b"/>
-    <text x="600" y="187" text-anchor="middle" fill="#8d8aa3" font-family="Cascadia Mono, Consolas, monospace" font-size="14">PowerShell · plan → extract → QA</text>
+    <text x="600" y="187" text-anchor="middle" fill="#8d8aa3" font-family="Cascadia Mono, Consolas, monospace" font-size="14">PowerShell · plan → extract → migrate → QA</text>
   </g>
 
   <g font-family="Cascadia Mono, Consolas, monospace" font-size="17">
@@ -50,17 +50,17 @@
     <line x1="88" y1="393" x2="1112" y2="393" stroke="#2c2940"/>
 
     <text x="88" y="431" fill="#70e0ff">PS&gt;</text>
-    <text x="130" y="431" fill="#e8e6f0">vn_qa.py check translations.jsonl --glossary glossary.json</text>
-    <text x="88" y="463" fill="#ff7582" font-weight="700">FAIL</text>
-    <text x="151" y="463" fill="#9491a8">2 blockers · glossary + layout + control tokens</text>
-    <text x="88" y="495" fill="#ff8b96">E terminology-mismatch</text>
-    <text x="355" y="495" fill="#c8c5d2">scene01.ks:2 · 先輩 → 学姐</text>
-    <text x="88" y="527" fill="#ff8b96">E character-budget</text>
-    <text x="355" y="527" fill="#c8c5d2">scene01.ks:3 · 92 / 80 characters</text>
+    <text x="130" y="431" fill="#e8e6f0">vn_translation_memory.py migrate --current v2 --previous v1</text>
+    <text x="88" y="463" fill="#68e4ad" font-weight="700">PASS</text>
+    <text x="151" y="463" fill="#9491a8">exact reuse 2 · review suggestions 1 · conflicts 0</text>
+    <text x="88" y="495" fill="#68e4ad">REUSED</text>
+    <text x="183" y="495" fill="#c8c5d2">exact ID/source · placeholders verified</text>
+    <text x="88" y="527" fill="#ffd36b">REVIEW</text>
+    <text x="183" y="527" fill="#c8c5d2">fuzzy match not applied · both input hashes recorded</text>
   </g>
 
   <g font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="15">
-    <text x="60" y="602" fill="#9793aa">Offline · no API key · KiriKiri / Ren'Py / NScripter source adapters</text>
+    <text x="60" y="602" fill="#9793aa">Offline · no API key · exact reuse only · fuzzy review queue</text>
     <text x="1140" y="602" text-anchor="end" fill="#777389">dshbase verified</text>
   </g>
 </svg>

@@ -27,3 +27,16 @@ python -X utf8 skill\scripts\vn_script_adapter.py extract examples\script-adapte
 ```
 
 The project scan should identify KiriKiri as an evidence-backed candidate. The translation fixture intentionally fails: one record adds a control tag and another is empty. It is useful for testing CI failure output and report rendering.
+
+Migrate translations after a script update without overwriting either input:
+
+```powershell
+python -X utf8 skill\scripts\vn_translation_memory.py migrate `
+  --current examples\translation-memory\current.jsonl `
+  --previous examples\translation-memory\previous.jsonl `
+  --output test_outputs\translation-memory\migrated.jsonl `
+  --report test_outputs\translation-memory\report.json `
+  --markdown test_outputs\translation-memory\report.md
+```
+
+The fixture reuses one exact ID/source pair and one relocated exact source. Its near match is review-only and remains untranslated. The report includes both input SHA-256 hashes and a pending/review queue.

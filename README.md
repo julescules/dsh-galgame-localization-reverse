@@ -7,14 +7,14 @@
 > [!IMPORTANT]
 > Unofficial community plugin. Independently developed and maintained; not reviewed or endorsed by DeepSeek.
 
-Audit first, localize second. Give DeepSeek Harness a visual-novel folder and get an evidence-backed engine candidate, risky files, encoding clues, strict translation QA, and a safe next step. The audit is offline and read-only; only report paths outside the audited tree are written.
+Audit first, reuse safely, localize second. Give DeepSeek Harness a visual-novel folder and get an evidence-backed engine candidate, safe translation migration, encoding clues, strict QA, and a reversible next step. The audit is offline and read-only; only report paths outside the audited tree are written.
 
 ![Synthetic terminal example: read-only engine audit and strict translation QA](docs/demo.svg)
 
 ## Start in 30 seconds
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.5.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.6.0
 ```
 
 Restart DSH, then ask:
@@ -59,6 +59,19 @@ python -X utf8 skill\scripts\vn_script_adapter.py apply D:\Games\Example `
 ```
 
 It does not open XP3/NSA archives or claim compiled-script support.
+
+### Safe translation migration after game updates
+
+`vn_translation_memory.py` carries reviewed translations into a newly extracted catalog without silently guessing. It auto-reuses only exact ID/source pairs or relocated exact source matches with one consistent, placeholder-safe target. Fuzzy matches are review-only; conflicts stay empty and make the command return a non-zero status. Both inputs remain unchanged and their SHA-256 hashes are recorded in the report.
+
+```powershell
+python -X utf8 skill\scripts\vn_translation_memory.py migrate `
+  --current D:\project\v2\translations.jsonl `
+  --previous D:\project\v1\translations.jsonl `
+  --output D:\project\v2\migrated.jsonl `
+  --report D:\project\logs\translation-memory.json `
+  --markdown D:\project\logs\translation-memory.md
+```
 
 ### Strict translation preflight
 
@@ -122,11 +135,11 @@ The registered name remains `galgame-localization-reverse`, so existing prompts 
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.5.0.tgz .\builds\v0.5.0
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.5.0.tgz -ChecksumsPath .\builds\v0.5.0\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.6.0.tgz .\builds\v0.6.0
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.6.0.tgz -ChecksumsPath .\builds\v0.6.0\SHA256SUMS
 ```
 
-The check runs provider tests plus deterministic self-tests for planning, script adapters, translation QA, and all bundled patch/asset utilities. Each release also publishes SHA-256 and CycloneDX SBOM evidence.
+The check runs provider tests plus deterministic self-tests for planning, script adapters, translation-memory migration, translation QA, and all bundled patch/asset utilities. Each release also publishes SHA-256 and CycloneDX SBOM evidence.
 
 ## Limits
 

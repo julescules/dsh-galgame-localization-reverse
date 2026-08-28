@@ -1,0 +1,4 @@
+**/__pycache__/**
+**/*.pyc
+operation_logs/
+test_outputs/

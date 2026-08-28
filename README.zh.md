@@ -7,14 +7,14 @@
 > [!IMPORTANT]
 > 非官方社区插件，由社区独立开发与维护，未经 DeepSeek 审核或背书。
 
-先体检，再汉化。把视觉小说目录交给 DeepSeek Harness，得到带证据的引擎候选、风险文件、编码线索、严格翻译 QA 和安全下一步。体检完全离线且只读；只允许把报告写到被审计目录之外。
+先体检，安全复用，再汉化。把视觉小说目录交给 DeepSeek Harness，得到带证据的引擎候选、安全翻译迁移、编码线索、严格 QA 和可回滚的下一步。体检完全离线且只读；只允许把报告写到被审计目录之外。
 
 ![合成终端示例：只读引擎体检与严格翻译 QA](docs/demo.svg)
 
 ## 30 秒开始
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.5.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.6.0
 ```
 
 重启 DSH，然后直接说：
@@ -59,6 +59,19 @@ python -X utf8 skill\scripts\vn_script_adapter.py apply D:\Games\Example `
 ```
 
 它不会打开 XP3/NSA 封包，也不宣称支持编译剧本。
+
+### 游戏更新后的安全翻译迁移
+
+`vn_translation_memory.py` 可把已审校译文迁移到新提取的文本表，但不会暗中猜测。它只自动复用“ID 与原文均相同”或“位置变化但原文完全相同”的唯一、占位符安全译文。模糊匹配只进入人工复核队列；冲突项保持空白并返回非零状态。两个输入文件都不会被覆盖，报告会记录双方 SHA-256。
+
+```powershell
+python -X utf8 skill\scripts\vn_translation_memory.py migrate `
+  --current D:\project\v2\translations.jsonl `
+  --previous D:\project\v1\translations.jsonl `
+  --output D:\project\v2\migrated.jsonl `
+  --report D:\project\logs\translation-memory.json `
+  --markdown D:\project\logs\translation-memory.md
+```
 
 ### 严格翻译门禁
 
@@ -122,11 +135,11 @@ python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.5.0.tgz .\builds\v0.5.0
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.5.0.tgz -ChecksumsPath .\builds\v0.5.0\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.6.0.tgz .\builds\v0.6.0
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.6.0.tgz -ChecksumsPath .\builds\v0.6.0\SHA256SUMS
 ```
 
-检查包含 Provider 测试，以及计划生成、脚本适配、翻译 QA 和全部补丁／资源工具的确定性自测。每个 Release 还会发布 SHA-256 与 CycloneDX SBOM 证据。
+检查包含 Provider 测试，以及计划生成、脚本适配、翻译记忆迁移、翻译 QA 和全部补丁／资源工具的确定性自测。每个 Release 还会发布 SHA-256 与 CycloneDX SBOM 证据。
 
 ## 边界
 
