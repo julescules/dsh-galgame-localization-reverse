@@ -36,7 +36,7 @@ test('all direct skill references and scripts exist', async () => {
 
 test('package metadata supports DSH profile inventory without installing duplicate host peers', async () => {
   const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
-  assert.equal(pkg.version, '0.5.0')
+  assert.equal(pkg.version, '0.6.0')
   assert.equal(pkg.exports['./package.json'], './package.json')
   assert.ok(pkg.files.includes('examples'))
   assert.ok(pkg.files.includes('scripts/build-release-metadata.mjs'))
@@ -49,9 +49,13 @@ test('Galgame Doctor entry points are packaged and discoverable', async () => {
   await access(new URL('../skill/scripts/vn_project_audit.py', import.meta.url))
   await access(new URL('../skill/scripts/vn_qa.py', import.meta.url))
   await access(new URL('../skill/scripts/vn_script_adapter.py', import.meta.url))
+  await access(new URL('../skill/scripts/vn_translation_memory.py', import.meta.url))
   await access(new URL('../examples/synthetic-project/game/startup.tjs', import.meta.url))
   await access(new URL('../examples/translations.jsonl', import.meta.url))
   await access(new URL('../examples/glossary.json', import.meta.url))
+  await access(new URL('../examples/translation-memory/current.jsonl', import.meta.url))
+  await access(new URL('../examples/translation-memory/previous.jsonl', import.meta.url))
   assert.match(candidate.description, /Galgame Doctor/)
   assert.match(candidate.whenToUse, /inspect a Galgame directory/)
+  assert.match(candidate.whenToUse, /migrate translations/)
 })

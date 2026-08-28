@@ -1,7 +1,7 @@
 {
   "name": "dsh-galgame-localization-reverse",
-  "version": "0.5.0",
-  "description": "Galgame Doctor for DeepSeek Harness: evidence plans, lossless source-script adapters, strict translation QA, and rollback.",
+  "version": "0.6.0",
+  "description": "Galgame Doctor for DeepSeek Harness: safe translation-memory migration, evidence plans, strict QA, and rollback.",
   "author": "julescules",
   "homepage": "https://github.com/julescules/dsh-galgame-localization-reverse#readme",
   "repository": {
@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "test": "node --test",
-    "check": "node --check index.js && node --check provider-core.js && npm test && python -X utf8 skill/scripts/vn_project_audit.py --selftest && python -X utf8 skill/scripts/vn_script_adapter.py --selftest && python -X utf8 skill/scripts/vn_qa.py --selftest && python -X utf8 skill/scripts/vn_patch.py --selftest && python -X utf8 skill/scripts/vn_image_qa.py --selftest && python -X utf8 skill/scripts/vn_slot_qa.py --selftest",
+    "check": "node --check index.js && node --check provider-core.js && npm test && python -B -X utf8 skill/scripts/vn_project_audit.py --selftest && python -B -X utf8 skill/scripts/vn_script_adapter.py --selftest && python -B -X utf8 skill/scripts/vn_translation_memory.py --selftest && python -B -X utf8 skill/scripts/vn_qa.py --selftest && python -B -X utf8 skill/scripts/vn_patch.py --selftest && python -B -X utf8 skill/scripts/vn_image_qa.py --selftest && python -B -X utf8 skill/scripts/vn_slot_qa.py --selftest",
     "pack:dry": "npm pack --dry-run",
     "release:metadata": "node scripts/build-release-metadata.mjs"
   },
@@ -65,6 +65,7 @@
     "galgame",
     "visual-novel",
     "translation-qa",
+    "translation-memory",
     "game-localization",
     "renpy",
     "kirikiri",

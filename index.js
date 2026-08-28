@@ -8,12 +8,12 @@ const RESOURCE_BASE = {
   path: fileURLToPath(new URL('./skill/', import.meta.url)),
 }
 const INVOCATION = { modelInvocable: true, userInvocable: true }
-const DESCRIPTION = 'Galgame Doctor for Windows visual novels: one-command project inspection, strict translation QA, engine evidence, encoding checks, and reversible patch release guidance.'
+const DESCRIPTION = 'Galgame Doctor for Windows visual novels: safe translation-memory migration, project inspection, strict QA, engine evidence, and reversible releases.'
 
 export const candidate = {
   name: 'galgame-localization-reverse',
   description: DESCRIPTION,
-  whenToUse: 'Use when a user wants to inspect a Galgame directory, identify its engine, audit translated text, diagnose encoding or UI risks, or build and verify a reversible localization patch.',
+  whenToUse: 'Use when a user wants to inspect a Galgame directory, identify its engine, migrate translations after a game or script update, audit translated text, diagnose encoding or UI risks, or build and verify a reversible localization patch.',
   invocation: INVOCATION,
   provider: PROVIDER_NAME,
   source: 'bundled',
