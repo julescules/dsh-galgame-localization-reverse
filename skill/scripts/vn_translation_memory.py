@@ -7,6 +7,7 @@ are suggestions for review and never populate the target field.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import sys
@@ -19,7 +20,7 @@ from typing import Any, Iterable
 from vn_qa import verify_placeholders
 
 
-SCHEMA_VERSION = "vn-translation-memory/v1"
+SCHEMA_VERSION = "vn-translation-memory/v2"
 
 
 def _load_records(path: Path) -> list[dict[str, Any]]:
@@ -81,24 +82,30 @@ def merge_records(
     target_field: str = "target",
     id_field: str = "segment_id",
     fuzzy_threshold: float = 0.86,
+    previous_origins: list[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not 0.0 <= fuzzy_threshold <= 1.0:
         raise ValueError("fuzzy threshold must be between 0 and 1")
 
+    if previous_origins is not None and len(previous_origins) != len(previous):
+        raise ValueError("previous_origins must align with previous records")
+    origins = previous_origins or ["previous"] * len(previous)
     current_ids: set[str] = set()
     previous_ids_by_object: dict[int, str] = {}
+    previous_origins_by_object: dict[int, str] = {}
     previous_by_id: dict[str, list[dict[str, Any]]] = defaultdict(list)
     previous_by_source: dict[str, list[dict[str, Any]]] = defaultdict(list)
     translated_previous = []
     for index, record in enumerate(previous, 1):
         record_id = _id(record, id_field, index)
         previous_ids_by_object[id(record)] = record_id
+        previous_origins_by_object[id(record)] = origins[index - 1]
         previous_by_id[record_id].append(record)
         source = _text(record, source_field)
         if source:
             previous_by_source[source].append(record)
         if source and _translated(record, source_field, target_field):
-            translated_previous.append((record_id, source, _text(record, target_field)))
+            translated_previous.append((record_id, source, _text(record, target_field), origins[index - 1]))
 
     merged: list[dict[str, Any]] = []
     details: list[dict[str, Any]] = []
@@ -138,7 +145,11 @@ def merge_records(
             if target is not None:
                 record[target_field] = target
                 counts["reused_by_id"] += 1
-                detail.update({"decision": "reused-exact-id", "previous_segment_id": record_id})
+                detail.update({
+                    "decision": "reused-exact-id",
+                    "previous_segment_id": record_id,
+                    "previous_catalogs": sorted({previous_origins_by_object[id(item)] for item in same_id}),
+                })
                 details.append(detail)
                 merged.append(record)
                 continue
@@ -153,6 +164,7 @@ def merge_records(
                 detail.update({
                     "decision": "reused-exact-source",
                     "previous_segment_ids": sorted({previous_ids_by_object[id(item)] for item in exact_source}),
+                    "previous_catalogs": sorted({previous_origins_by_object[id(item)] for item in exact_source}),
                 })
                 details.append(detail)
                 merged.append(record)
@@ -166,10 +178,10 @@ def merge_records(
             merged.append(record)
             continue
 
-        best: tuple[float, str, str, str] | None = None
-        for previous_id, previous_source, previous_target in translated_previous:
+        best: tuple[float, str, str, str, str] | None = None
+        for previous_id, previous_source, previous_target, previous_origin in translated_previous:
             ratio = SequenceMatcher(None, source, previous_source, autojunk=False).ratio()
-            candidate = (ratio, previous_id, previous_source, previous_target)
+            candidate = (ratio, previous_id, previous_source, previous_target, previous_origin)
             if best is None or candidate > best:
                 best = candidate
         if best is not None and best[0] >= fuzzy_threshold:
@@ -181,6 +193,7 @@ def merge_records(
                 "previous_source": best[2],
                 "suggested_target": best[3],
                 "placeholder_compatible": placeholder["ok"],
+                "previous_catalog": best[4],
             })
             counts["suggestions"] += 1
         else:
@@ -196,7 +209,7 @@ def merge_records(
         "previous_records": len(previous),
         **counts,
         "fuzzy_threshold": fuzzy_threshold,
-        "policy": "Only exact ID/source matches with one placeholder-safe target are auto-reused; fuzzy matches are review-only.",
+        "policy": "Across all history catalogs, only exact ID/source matches with one placeholder-safe target are auto-reused; fuzzy matches are review-only.",
         "details": details,
     }
     return merged, report
@@ -218,12 +231,34 @@ def _write_text(path: Path, text: str, *, force: bool) -> None:
     path.write_text(text, encoding="utf-8", newline="\n")
 
 
+def _write_review_csv(path: Path, report: dict[str, Any], *, current_sha256: str, force: bool) -> None:
+    if path.exists() and not force:
+        raise FileExistsError(f"output exists; use --force to replace it: {path}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fields = [
+        "current_sha256", "segment_id", "decision", "reason", "similarity",
+        "previous_catalog", "previous_segment_id", "previous_source",
+        "suggested_target", "placeholder_compatible", "reviewed_target", "reviewer_notes",
+    ]
+    review = [item for item in report["details"] if item["decision"] in {"conflict", "review-suggestion", "pending"}]
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        for item in review:
+            row = {key: item.get(key, "") for key in fields}
+            row["current_sha256"] = current_sha256
+            if not row["previous_catalog"] and item.get("previous_catalogs"):
+                row["previous_catalog"] = " | ".join(item["previous_catalogs"])
+            writer.writerow(row)
+
+
 def _markdown(report: dict[str, Any]) -> str:
     lines = [
         "# Translation memory merge",
         "",
         f"- Status: **{report['status']}**",
-        f"- Current / previous: {report['current_records']} / {report['previous_records']}",
+        f"- Current / previous records: {report['current_records']} / {report['previous_records']}",
+        f"- Previous catalogs: {report.get('previous_catalog_count', 1)}",
         f"- Reused by ID / source: {report['reused_by_id']} / {report['reused_by_source']}",
         f"- Kept current: {report['kept_current']}",
         f"- Suggestions / conflicts / pending: {report['suggestions']} / {report['conflicts']} / {report['pending']}",
@@ -260,7 +295,7 @@ def _selftest() -> int:
         {"segment_id": "d2", "source": "競合", "target": "乙"},
         {"segment_id": "e", "source": "破損 {name}", "target": "损坏"},
     ]
-    merged, report = merge_records(current, previous, fuzzy_threshold=0.7)
+    merged, report = merge_records(current, previous, fuzzy_threshold=0.7, previous_origins=["v1"] * len(previous))
     assert merged[0]["target"] == "你好 {name}"
     assert merged[1]["target"] == "新行"
     assert merged[2]["target"] == ""
@@ -269,10 +304,11 @@ def _selftest() -> int:
     assert report["suggestions"] >= 1 and report["conflicts"] == 2 and report["kept_current"] == 1
     with tempfile.TemporaryDirectory(prefix="vn-tm-") as temp_value:
         temp = Path(temp_value)
-        output, report_path = temp / "merged.jsonl", temp / "report.json"
+        output, report_path, review_path = temp / "merged.jsonl", temp / "report.json", temp / "review.csv"
         _write_jsonl(output, merged, force=False)
-        report["inputs"] = {"current_sha256": "fixture", "previous_sha256": "fixture"}
+        report["inputs"] = {"current_sha256": "fixture", "previous": [{"path": "v1", "sha256": "fixture", "records": len(previous)}]}
         _write_text(report_path, json.dumps(report, ensure_ascii=False, indent=2) + "\n", force=False)
+        _write_review_csv(review_path, report, current_sha256="fixture", force=False)
         assert len(_load_records(output)) == len(current)
         assert json.loads(report_path.read_text(encoding="utf-8"))["schema"] == SCHEMA_VERSION
     print("selftest OK")
@@ -280,15 +316,16 @@ def _selftest() -> int:
 
 
 def main(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(description="Merge a previous VN translation into a newly extracted catalog without auto-applying fuzzy matches.")
+    parser = argparse.ArgumentParser(description="Merge one or more previous VN translations into a newly extracted catalog without auto-applying fuzzy matches.")
     parser.add_argument("--selftest", action="store_true")
     sub = parser.add_subparsers(dest="command")
     migrate = sub.add_parser("migrate")
     migrate.add_argument("--current", required=True)
-    migrate.add_argument("--previous", required=True)
+    migrate.add_argument("--previous", action="append", required=True, help="Previous catalog; repeat for multiple release histories.")
     migrate.add_argument("--output", required=True)
     migrate.add_argument("--report", required=True)
     migrate.add_argument("--markdown")
+    migrate.add_argument("--review-csv", help="UTF-8 BOM CSV queue for conflicts, fuzzy suggestions, and pending segments.")
     migrate.add_argument("--source-field", default="source")
     migrate.add_argument("--target-field", default="target")
     migrate.add_argument("--id-field", default="segment_id")
@@ -300,20 +337,28 @@ def main(argv: list[str]) -> int:
     if args.command != "migrate":
         parser.error("choose migrate or --selftest")
 
-    current_path, previous_path = Path(args.current).resolve(strict=True), Path(args.previous).resolve(strict=True)
+    current_path = Path(args.current).resolve(strict=True)
+    previous_paths = [Path(value).resolve(strict=True) for value in args.previous]
+    if len(set(previous_paths)) != len(previous_paths):
+        raise ValueError("each --previous catalog must be distinct")
     output_path, report_path = Path(args.output).resolve(strict=False), Path(args.report).resolve(strict=False)
     markdown_path = Path(args.markdown).resolve(strict=False) if args.markdown else None
-    protected = {current_path, previous_path}
-    if output_path in protected or report_path in protected or markdown_path in protected:
-        raise ValueError("outputs must not overwrite either input catalog")
-    if len({str(item) for item in (output_path, report_path, markdown_path) if item is not None}) < (3 if markdown_path else 2):
-        raise ValueError("output, report, and markdown paths must be distinct")
+    review_csv_path = Path(args.review_csv).resolve(strict=False) if args.review_csv else None
+    protected = {current_path, *previous_paths}
+    outputs = [item for item in (output_path, report_path, markdown_path, review_csv_path) if item is not None]
+    if any(item in protected for item in outputs):
+        raise ValueError("outputs must not overwrite any input catalog")
+    if len(set(outputs)) != len(outputs):
+        raise ValueError("output, report, markdown, and review CSV paths must be distinct")
     if not args.force:
-        existing = [path for path in (output_path, report_path, markdown_path) if path is not None and path.exists()]
+        existing = [path for path in outputs if path.exists()]
         if existing:
             raise FileExistsError(f"output exists; use --force to replace it: {existing[0]}")
 
-    current, previous = _load_records(current_path), _load_records(previous_path)
+    current = _load_records(current_path)
+    previous_catalogs = [(path, _load_records(path)) for path in previous_paths]
+    previous = [record for _, records in previous_catalogs for record in records]
+    previous_origins = [str(path) for path, records in previous_catalogs for _ in records]
     merged, report = merge_records(
         current,
         previous,
@@ -321,17 +366,23 @@ def main(argv: list[str]) -> int:
         target_field=args.target_field,
         id_field=args.id_field,
         fuzzy_threshold=args.fuzzy_threshold,
+        previous_origins=previous_origins,
     )
+    report["previous_catalog_count"] = len(previous_catalogs)
     report["inputs"] = {
         "current": str(current_path),
         "current_sha256": _sha256(current_path),
-        "previous": str(previous_path),
-        "previous_sha256": _sha256(previous_path),
+        "previous": [
+            {"path": str(path), "sha256": _sha256(path), "records": len(records)}
+            for path, records in previous_catalogs
+        ],
     }
     _write_jsonl(output_path, merged, force=args.force)
     _write_text(report_path, json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", force=args.force)
     if markdown_path is not None:
         _write_text(markdown_path, _markdown(report), force=args.force)
+    if review_csv_path is not None:
+        _write_review_csv(review_csv_path, report, current_sha256=report["inputs"]["current_sha256"], force=args.force)
     print(json.dumps({key: report[key] for key in ("schema", "status", "reused_by_id", "reused_by_source", "suggestions", "conflicts", "pending")}, ensure_ascii=False))
     return 0 if report["conflicts"] == 0 else 1
 

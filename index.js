@@ -8,7 +8,7 @@ const RESOURCE_BASE = {
   path: fileURLToPath(new URL('./skill/', import.meta.url)),
 }
 const INVOCATION = { modelInvocable: true, userInvocable: true }
-const DESCRIPTION = 'Galgame Doctor for Windows visual novels: safe translation-memory migration, project inspection, strict QA, engine evidence, and reversible releases.'
+const DESCRIPTION = 'Galgame Doctor for Windows visual novels: multi-release translation-memory migration, reviewer queues, project inspection, strict QA, engine evidence, and reversible releases.'
 
 export const candidate = {
   name: 'galgame-localization-reverse',

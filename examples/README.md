@@ -34,9 +34,11 @@ Migrate translations after a script update without overwriting either input:
 python -X utf8 skill\scripts\vn_translation_memory.py migrate `
   --current examples\translation-memory\current.jsonl `
   --previous examples\translation-memory\previous.jsonl `
+  --previous examples\translation-memory\previous-hotfix.jsonl `
   --output test_outputs\translation-memory\migrated.jsonl `
   --report test_outputs\translation-memory\report.json `
-  --markdown test_outputs\translation-memory\report.md
+  --markdown test_outputs\translation-memory\report.md `
+  --review-csv test_outputs\translation-memory\review.csv
 ```
 
-The fixture reuses one exact ID/source pair and one relocated exact source. Its near match is review-only and remains untranslated. The report includes both input SHA-256 hashes and a pending/review queue.
+Repeat `--previous` when several old releases contain reviewed work. The two history fixtures reuse one exact ID/source pair and two relocated exact sources. The near match remains review-only. The report includes every input SHA-256, and the CSV contains the pending/review queue.

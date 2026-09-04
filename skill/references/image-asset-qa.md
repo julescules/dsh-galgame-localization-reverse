@@ -34,6 +34,8 @@ The tool intentionally does not decode engine-native containers such as AKB, CBG
 
 ## Visual and runtime review
 
+On DSH 0.1.2-rc.1 or newer, use the official `read_image` tool for focused PNG/JPEG/WebP/GIF review, including extensionless image attachments. This improves visual triage only: keep `vn_image_qa.py` geometry/alpha/frame evidence and in-game state checks as separate release gates.
+
 - Preserve the original canvas, sprite grid, control-family grouping, border pixels, alpha, gradients, and every runtime state unless the engine contract proves a change is safe.
 - Review at native scale and nearest-neighbor magnification. Do not use a smoothed preview to approve pixel geometry.
 - For multimodal model review, provide paired original/localized crops with the asset path and expected state. Ask for specific observations, not a generic quality score.
