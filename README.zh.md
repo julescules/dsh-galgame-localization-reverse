@@ -1,8 +1,28 @@
 # DeepSeek Harness Galgame Doctor
 
+
+**游戏更新后复用旧译文，把人工审核结果可靠地带回汉化流程。**
+
+| 你手上的材料 | 插件能给你的结果 |
+|---|---|
+| 不熟悉的游戏目录 | 引擎候选、文件证据和下一步计划 |
+| 旧译文与新版脚本 | 精确复用、冲突报告和审核表 |
+| 人工改好的审核表 | 校验后生成新的译文 JSONL |
+| 待发布补丁 | 控制符、编码、资源与回滚检查 |
+
+本版补齐审核闭环：迁移时用 `--review-csv review.csv` 导出表格，在 Excel/WPS 中填写确认过的 `reviewed_target`，再导回：
+
+```powershell
+python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-csv review.csv --output reviewed.jsonl --encoding gbk
+```
+
+`current.jsonl` 必须是迁移时原始 current 文件，不能换成 migrated 输出。导入器核对哈希、重复/未知段落、控制符和目标编码；所有行通过后才生成新文件，空白审核项保留待办。支持默认字段 `segment_id/source/target`。接着以 reviewed.jsonl 为 current 再做一次历史迁移，合并精确复用结果，最后运行严格 QA。
+
+安装本版：`dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.0`，然后重启 DSH。
+
 中文 | [English](README.md)
 
-[![dshbase verified](https://img.shields.io/badge/dshbase-verified-16a34a)](https://dshbase.com/zh/plugins/dsh-galgame-localization-reverse/) [![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
+[![dshbase listed](https://img.shields.io/badge/dshbase-listed-blue)](https://dshbase.com/zh/plugins/dsh-galgame-localization-reverse/) [![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
 
 > [!IMPORTANT]
 > 非官方社区插件，由社区独立开发与维护，未经 DeepSeek 审核或背书。
@@ -14,7 +34,7 @@
 ## 30 秒开始
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.7.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.0
 ```
 
 重启 DSH，然后直接说：
@@ -137,8 +157,8 @@ python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.7.0.tgz .\builds\v0.7.0
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.7.0.tgz -ChecksumsPath .\builds\v0.7.0\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.8.0.tgz .\builds\v0.8.0
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.8.0.tgz -ChecksumsPath .\builds\v0.8.0\SHA256SUMS
 ```
 
 检查包含 Provider 测试，以及计划生成、脚本适配、翻译记忆迁移、翻译 QA 和全部补丁／资源工具的确定性自测。每个 Release 还会发布 SHA-256 与 CycloneDX SBOM 证据。
@@ -156,3 +176,5 @@ node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.7.0
 ## 许可
 
 [MIT](LICENSE)
+
+兼容性：已在 DSH 0.1.2-rc.1 运行验证。官方 GitHub 已发布 0.1.3-alpha.1，但截至 2026-09-05 对应 npm 包未能获取，尚未完成该 alpha 的运行验证。

@@ -2,13 +2,15 @@
 name: galgame-localization-reverse
 description: Windows galgame/视觉小说项目体检、版本更新翻译迁移、汉化、保护机制逆向与可回滚补丁工程。Use for one-command engine-evidence scans, safe translation-memory reuse after script updates, strict translation QA, third-party patch forensics, archive/encryption/license analysis, DMM/SoftDenchi launch-authorization work, text/image/UI localization, encoding repair, save-resume compatibility, reversible packaging, portable releases, graphical installers, and bytecode tooling.
 metadata:
-  version: "0.7.0"
+  version: "0.8.0"
   capabilities: engine-audit, translation-memory, script-adapters, strict-qa, reversible-release
 ---
 
 # Galgame Localization Reverse
 
 ## Core stance
+
+For a translation-memory review CSV completed by a human, use `scripts/vn_review.py --current ORIGINAL-CURRENT.jsonl --review-csv review.csv --output reviewed.jsonl`. The current input must be the exact catalog whose SHA-256 was recorded during migration, not the migrated output. Only nonempty `reviewed_target` values are applied; suggestions are never approvals. Run migration again using the reviewed catalog as current to combine reviewed rows with exact historical reuse, then run strict QA before source-script writeback. The importer currently supports the default `segment_id`, `source`, `target` fields. Optional `--encoding gbk` checks representability. Keep every output separate from inputs.
 
 Treat the work as a localization and reverse-engineering pipeline. Prefer static, file-level extraction, reproducible analysis, and reversible patching. Keep protection-mechanism research isolated from localization payloads, and do not present full-game repacking with original assets or public distribution of copyrighted resources as supported default paths.
 

@@ -1,8 +1,31 @@
 # Galgame Doctor for DeepSeek Harness
 
+**Keep reviewed translations when a game updates. Catch broken control codes before shipping.**
+
+| Starting point | Result |
+|---|---|
+| An unfamiliar game folder | Engine candidates with concrete evidence and a next-step plan |
+| Old translations + new scripts | Exact reuse, conflict report, and a human review queue |
+| A completed review spreadsheet | Hash-checked JSONL with only explicitly reviewed targets applied |
+| A candidate patch | Translation, encoding, asset, and rollback checks |
+
+### New in v0.8.0: bring human review back into the workflow
+
+1. Run translation-memory migration with `--review-csv review.csv`.
+2. Open the CSV in Excel/WPS and fill only `reviewed_target` for rows you approve.
+3. Import against the **original current catalog** used by migration:
+
+```powershell
+python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-csv review.csv --output reviewed.jsonl --encoding gbk
+```
+
+The importer rejects a changed catalog, duplicate or unknown IDs, broken placeholders, encoding failures, and conflicting existing translations. It writes a new file only after every row validates. Blank reviewed targets remain pending. Default `segment_id`, `source`, and `target` fields are supported.
+
+Run migration again with `reviewed.jsonl` as current to combine human decisions with historical exact reuse, then run strict QA before script writeback. Source game files are never changed by the review importer.
+
 [中文](README.zh.md) | English
 
-[![dshbase verified](https://img.shields.io/badge/dshbase-verified-16a34a)](https://dshbase.com/plugins/dsh-galgame-localization-reverse/) [![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
+[![dshbase listed](https://img.shields.io/badge/dshbase-listed-blue)](https://dshbase.com/plugins/dsh-galgame-localization-reverse/) [![CI](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/julescules/dsh-galgame-localization-reverse/actions/workflows/ci.yml)
 
 > [!IMPORTANT]
 > Unofficial community plugin. Independently developed and maintained; not reviewed or endorsed by DeepSeek.
@@ -14,7 +37,7 @@ Audit first, reuse safely, localize second. Give DeepSeek Harness a visual-novel
 ## Start in 30 seconds
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.7.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.0
 ```
 
 Restart DSH, then ask:
@@ -137,8 +160,8 @@ The registered name remains `galgame-localization-reverse`, so existing prompts 
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.7.0.tgz .\builds\v0.7.0
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.7.0.tgz -ChecksumsPath .\builds\v0.7.0\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.8.0.tgz .\builds\v0.8.0
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.8.0.tgz -ChecksumsPath .\builds\v0.8.0\SHA256SUMS
 ```
 
 The check runs provider tests plus deterministic self-tests for planning, script adapters, translation-memory migration, translation QA, and all bundled patch/asset utilities. Each release also publishes SHA-256 and CycloneDX SBOM evidence.
@@ -156,3 +179,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md) for contri
 ## License
 
 [MIT](LICENSE)
+
+Compatibility: runtime-validated on DSH 0.1.2-rc.1. Upstream 0.1.3-alpha.1 is published on GitHub; its npm package was unavailable on 2026-09-05, so runtime compatibility with that alpha is not yet claimed.
