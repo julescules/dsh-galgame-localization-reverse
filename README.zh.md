@@ -1,5 +1,7 @@
 # DeepSeek Harness Galgame Doctor
 
+本版更新：审核 CSV 的重复列名、缺失单元格、多余单元格均给出明确错误；演示图展示完整审核流程。
+
 
 **游戏更新后复用旧译文，把人工审核结果可靠地带回汉化流程。**
 
@@ -18,7 +20,7 @@ python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-cs
 
 `current.jsonl` 必须是迁移时原始 current 文件，不能换成 migrated 输出。导入器核对哈希、重复/未知段落、控制符和目标编码；所有行通过后才生成新文件，空白审核项保留待办。支持默认字段 `segment_id/source/target`。接着以 reviewed.jsonl 为 current 再做一次历史迁移，合并精确复用结果，最后运行严格 QA。
 
-安装本版：`dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.0`，然后重启 DSH。
+安装本版：`dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.1`，然后重启 DSH。
 
 中文 | [English](README.md)
 
@@ -29,12 +31,12 @@ python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-cs
 
 先体检，安全复用，再汉化。把视觉小说目录交给 DeepSeek Harness，得到带证据的引擎候选、安全翻译迁移、编码线索、严格 QA 和可回滚的下一步。体检完全离线且只读；只允许把报告写到被审计目录之外。
 
-![合成终端示例：只读引擎体检与严格翻译 QA](docs/demo.svg)
+![合成终端示例：只读引擎体检与严格翻译 QA](docs/demo.png)
 
 ## 30 秒开始
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.1
 ```
 
 重启 DSH，然后直接说：
@@ -157,8 +159,8 @@ python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.8.0.tgz .\builds\v0.8.0
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.8.0.tgz -ChecksumsPath .\builds\v0.8.0\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.8.1.tgz .\builds\v0.8.1
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.8.1.tgz -ChecksumsPath .\builds\v0.8.1\SHA256SUMS
 ```
 
 检查包含 Provider 测试，以及计划生成、脚本适配、翻译记忆迁移、翻译 QA 和全部补丁／资源工具的确定性自测。每个 Release 还会发布 SHA-256 与 CycloneDX SBOM 证据。
@@ -177,4 +179,4 @@ node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.8.0
 
 [MIT](LICENSE)
 
-兼容性：已在 DSH 0.1.2-rc.1 运行验证。官方 GitHub 已发布 0.1.3-alpha.1，但截至 2026-09-05 对应 npm 包未能获取，尚未完成该 alpha 的运行验证。
+兼容性：已在 DSH 0.1.2-rc.1 运行验证。官方 GitHub 已发布 0.1.3-alpha.1，但截至 2026-09-06 对应 npm 包未能获取，尚未完成该 alpha 的运行验证。

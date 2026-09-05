@@ -3,6 +3,12 @@ from vn_review import apply_review
 
 
 class ReviewTests(unittest.TestCase):
+    def test_malformed_rows_are_rejected(self):
+        records = [{'segment_id': 'a', 'source': 'Hi', 'target': ''}]
+        for row in [{'current_sha256': 'hash', 'segment_id': 'a', 'reviewed_target': None}, {'current_sha256': 'hash', 'segment_id': 'a', 'reviewed_target': '你好', None: ['extra']}]:
+            with self.assertRaisesRegex(ValueError, 'malformed CSV'):
+                apply_review(records, [row], 'hash')
+
     def test_review_is_explicit_and_preserves_inputs(self):
         records = [{'segment_id': 'a', 'source': 'Hi {name}', 'target': ''}]
         rows = [{'current_sha256': 'hash', 'segment_id': 'a', 'reviewed_target': '你好 {name}'}]

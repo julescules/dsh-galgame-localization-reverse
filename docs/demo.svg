@@ -1,66 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">Galgame Doctor synthetic terminal report</title>
-  <desc id="desc">A terminal-style synthetic example showing an evidence-backed KiriKiri localization plan and safe translation-memory migration.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#08111f"/>
-      <stop offset="1" stop-color="#161129"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#58e1ff"/>
-      <stop offset="1" stop-color="#c184ff"/>
-    </linearGradient>
-    <filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-opacity=".38"/></filter>
-  </defs>
-  <rect width="1200" height="630" rx="28" fill="url(#bg)"/>
-  <circle cx="1110" cy="70" r="230" fill="#9e6cff" opacity=".08"/>
-  <circle cx="90" cy="600" r="270" fill="#42d9ff" opacity=".06"/>
-
-  <g font-family="Segoe UI, Noto Sans SC, sans-serif">
-    <text x="60" y="70" fill="#f7f5ff" font-size="38" font-weight="700">Galgame Doctor</text>
-    <text x="60" y="106" fill="#bdb8d5" font-size="19">Audit, reuse safely, localize · 体检、安全复用、汉化</text>
-    <rect x="60" y="128" width="1080" height="3" rx="2" fill="url(#accent)"/>
-    <rect x="950" y="54" width="190" height="42" rx="21" fill="#152a35" stroke="#4ee3ad"/>
-    <text x="1045" y="81" text-anchor="middle" fill="#69e8bd" font-size="15" font-weight="700">SYNTHETIC EXAMPLE</text>
-  </g>
-
-  <g filter="url(#shadow)">
-    <rect x="60" y="160" width="1080" height="405" rx="18" fill="#090d17" stroke="#34304a" stroke-width="2"/>
-    <rect x="60" y="160" width="1080" height="42" rx="18" fill="#171b2a"/>
-    <rect x="60" y="184" width="1080" height="18" fill="#171b2a"/>
-    <circle cx="87" cy="181" r="6" fill="#ff6b77"/>
-    <circle cx="108" cy="181" r="6" fill="#ffcc67"/>
-    <circle cx="129" cy="181" r="6" fill="#55df9b"/>
-    <text x="600" y="187" text-anchor="middle" fill="#8d8aa3" font-family="Cascadia Mono, Consolas, monospace" font-size="14">PowerShell · plan → extract → migrate → QA</text>
-  </g>
-
-  <g font-family="Cascadia Mono, Consolas, monospace" font-size="17">
-    <text x="88" y="239" fill="#70e0ff">PS&gt;</text>
-    <text x="130" y="239" fill="#e8e6f0">vn_project_audit.py plan D:\Games\Example</text>
-    <text x="88" y="271" fill="#68e4ad">READ-ONLY</text>
-    <text x="210" y="271" fill="#9491a8">input files changed: 0</text>
-    <text x="88" y="303" fill="#f4f2fa">ENGINE</text>
-    <text x="183" y="303" fill="#ffd36b">candidate</text>
-    <text x="290" y="303" fill="#f4f2fa">KiriKiri · confidence 0.76</text>
-    <text x="88" y="335" fill="#8f8ca3">evidence</text>
-    <text x="183" y="335" fill="#c8c5d2">startup.tjs · scenario/*.ks · 2 signal groups</text>
-    <text x="88" y="367" fill="#8f8ca3">route</text>
-    <text x="183" y="367" fill="#c8c5d2">lossless .ks adapter · source tree stays immutable</text>
-
-    <line x1="88" y1="393" x2="1112" y2="393" stroke="#2c2940"/>
-
-    <text x="88" y="431" fill="#70e0ff">PS&gt;</text>
-    <text x="130" y="431" fill="#e8e6f0">vn_translation_memory.py migrate --current v2 --previous v1</text>
-    <text x="88" y="463" fill="#68e4ad" font-weight="700">PASS</text>
-    <text x="151" y="463" fill="#9491a8">exact reuse 2 · review suggestions 1 · conflicts 0</text>
-    <text x="88" y="495" fill="#68e4ad">REUSED</text>
-    <text x="183" y="495" fill="#c8c5d2">exact ID/source · placeholders verified</text>
-    <text x="88" y="527" fill="#ffd36b">REVIEW</text>
-    <text x="183" y="527" fill="#c8c5d2">fuzzy match not applied · both input hashes recorded</text>
-  </g>
-
-  <g font-family="Segoe UI, Noto Sans SC, sans-serif" font-size="15">
-    <text x="60" y="602" fill="#9793aa">Offline · no API key · exact reuse only · fuzzy review queue</text>
-    <text x="1140" y="602" text-anchor="end" fill="#777389">dshbase verified</text>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">Galgame Doctor 0.8.1</title><desc id="desc">复用旧译文，让人工审核走完最后一步。功能示意图，非软件截图。</desc>
+<rect width="1440" height="810" rx="28" fill="#101725"/>
+<circle cx="1390" cy="40" r="270" fill="#c9a3ff" opacity=".07"/>
+<g font-family="Segoe UI, Microsoft YaHei, sans-serif">
+<text x="72" y="80" fill="#c9a3ff" font-size="19" letter-spacing="3">DEEPSEEK HARNESS / COMMUNITY PLUGIN</text>
+<text x="72" y="157" fill="#f5f7fb" font-size="49" font-weight="700">Galgame Doctor</text>
+<text x="72" y="212" fill="#bec9db" font-size="28">复用旧译文，让人工审核走完最后一步</text>
+<rect x="72" y="253" width="1296" height="2" fill="#344257"/>
+<g transform="translate(72,300)">
+<rect width="416" height="270" rx="20" fill="#1b2638" stroke="#35435a"/>
+<text x="28" y="49" fill="#c9a3ff" font-size="18" font-weight="600">01 / MIGRATE</text>
+<text x="28" y="112" fill="#fff" font-size="27" font-weight="700">新版脚本 + 历史译文</text>
+<text x="28" y="165" fill="#bac6d8" font-size="19">精确复用 · 冲突进入审核表</text>
+<rect x="28" y="210" width="66" height="5" rx="2" fill="#c9a3ff"/>
+</g>
+<g transform="translate(512,300)">
+<rect width="416" height="270" rx="20" fill="#1b2638" stroke="#35435a"/>
+<text x="28" y="49" fill="#c9a3ff" font-size="18" font-weight="600">02 / REVIEW</text>
+<text x="28" y="112" fill="#fff" font-size="27" font-weight="700">在 Excel / WPS 中审核</text>
+<text x="28" y="165" fill="#bac6d8" font-size="19">仅填写确认过的 reviewed_target</text>
+<rect x="28" y="210" width="66" height="5" rx="2" fill="#c9a3ff"/>
+</g>
+<g transform="translate(952,300)">
+<rect width="416" height="270" rx="20" fill="#1b2638" stroke="#35435a"/>
+<text x="28" y="49" fill="#c9a3ff" font-size="18" font-weight="600">03 / IMPORT</text>
+<text x="28" y="112" fill="#fff" font-size="27" font-weight="700">校验后生成新译文</text>
+<text x="28" y="165" fill="#bac6d8" font-size="19">哈希 · 段落 ID · 控制符 · 编码</text>
+<rect x="28" y="210" width="66" height="5" rx="2" fill="#c9a3ff"/>
+</g>
+<text x="72" y="640" fill="#c9a3ff" font-size="25" font-weight="600">迁移 → 人工审核 → 导入 → 再迁移 → 严格 QA</text>
+<text x="72" y="687" fill="#bbc6d5" font-size="21">输出到新文件 · 游戏资源保持原样 · CSV 格式错误明确提示</text>
+<text x="72" y="762" fill="#8898af" font-size="17">v0.8.1 · 非官方社区插件 · 功能示意图 / NOT A SCREENSHOT</text>
+<text x="1368" y="762" text-anchor="end" fill="#8898af" font-size="17">julescules / GitHub</text>
+</g></svg>

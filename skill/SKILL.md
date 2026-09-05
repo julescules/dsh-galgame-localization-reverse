@@ -2,7 +2,7 @@
 name: galgame-localization-reverse
 description: Windows galgame/视觉小说项目体检、版本更新翻译迁移、汉化、保护机制逆向与可回滚补丁工程。Use for one-command engine-evidence scans, safe translation-memory reuse after script updates, strict translation QA, third-party patch forensics, archive/encryption/license analysis, DMM/SoftDenchi launch-authorization work, text/image/UI localization, encoding repair, save-resume compatibility, reversible packaging, portable releases, graphical installers, and bytecode tooling.
 metadata:
-  version: "0.8.0"
+  version: "0.8.1"
   capabilities: engine-audit, translation-memory, script-adapters, strict-qa, reversible-release
 ---
 

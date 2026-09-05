@@ -36,7 +36,7 @@ test('all direct skill references and scripts exist', async () => {
 
 test('package metadata supports DSH profile inventory without installing duplicate host peers', async () => {
   const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
-  assert.equal(pkg.version, '0.8.0')
+  assert.equal(pkg.version, '0.8.1')
   assert.equal(pkg.exports['./package.json'], './package.json')
   assert.ok(pkg.files.includes('examples'))
   assert.ok(pkg.files.includes('scripts/build-release-metadata.mjs'))

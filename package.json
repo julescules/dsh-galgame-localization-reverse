@@ -1,6 +1,6 @@
 {
   "name": "dsh-galgame-localization-reverse",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Galgame Doctor for DeepSeek Harness: multi-release translation memory, reviewer CSV queues, evidence plans, strict QA, and rollback.",
   "author": "julescules",
   "homepage": "https://github.com/julescules/dsh-galgame-localization-reverse#readme",
@@ -29,6 +29,7 @@
     "CONTRIBUTING.md",
     "SECURITY.md",
     "docs/demo.svg",
+    "docs/demo.png",
     "scripts/build-release-metadata.mjs",
     "scripts/verify-release.ps1",
     "LICENSE"

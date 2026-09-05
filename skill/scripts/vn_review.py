@@ -20,6 +20,8 @@ def apply_review(records, rows, expected_hash, encoding=None):
     seen = set()
     applied = 0
     for row in rows:
+        if None in row or any(value is None for value in row.values()):
+            raise ValueError('malformed CSV row: missing or extra cells')
         if row.get('current_sha256') != expected_hash:
             raise ValueError('review CSV belongs to a different current catalog')
         key = row.get('segment_id')
@@ -27,6 +29,8 @@ def apply_review(records, rows, expected_hash, encoding=None):
             raise ValueError('unknown or duplicate review segment ID')
         seen.add(key)
         target = row.get('reviewed_target', '')
+        if not isinstance(target, str):
+            raise ValueError('reviewed_target must be text')
         if not target.strip():
             continue
         record = index[key]
@@ -57,6 +61,8 @@ def main():
     digest = hashlib.sha256(current.read_bytes()).hexdigest()
     with review.open(encoding='utf-8-sig', newline='') as handle:
         reader = csv.DictReader(handle)
+        if len(reader.fieldnames or []) != len(set(reader.fieldnames or [])):
+            raise ValueError('duplicate CSV column names')
         if not {'current_sha256', 'segment_id', 'reviewed_target'} <= set(reader.fieldnames or []):
             raise ValueError('missing required review CSV columns')
         records, count = apply_review(_load_records(current), list(reader), digest, args.encoding)
