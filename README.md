@@ -1,6 +1,6 @@
 # Galgame Doctor for DeepSeek Harness
 
-This release rejects duplicate CSV headers, missing cells, and extra cells with clear errors. The new diagram explains the review workflow.
+Preflight reviewed translations with --dry-run before importing: validate hashes, placeholders, encoding, and strict CSV syntax without writing a catalog.
 
 **Keep reviewed translations when a game updates. Catch broken control codes before shipping.**
 
@@ -11,7 +11,7 @@ This release rejects duplicate CSV headers, missing cells, and extra cells with 
 | A completed review spreadsheet | Hash-checked JSONL with only explicitly reviewed targets applied |
 | A candidate patch | Translation, encoding, asset, and rollback checks |
 
-### New in v0.8.1: bring human review back into the workflow
+### New in v0.9.0: bring human review back into the workflow
 
 1. Run translation-memory migration with `--review-csv review.csv`.
 2. Open the CSV in Excel/WPS and fill only `reviewed_target` for rows you approve.
@@ -24,6 +24,15 @@ python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-cs
 The importer rejects a changed catalog, duplicate or unknown IDs, broken placeholders, encoding failures, and conflicting existing translations. It writes a new file only after every row validates. Blank reviewed targets remain pending. Default `segment_id`, `source`, and `target` fields are supported.
 
 Run migration again with `reviewed.jsonl` as current to combine human decisions with historical exact reuse, then run strict QA before script writeback. Source game files are never changed by the review importer.
+
+
+### Preflight before import
+
+```powershell
+python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-csv review.csv --dry-run --encoding gbk
+```
+
+Preflight rejects `--output` and writes no files. In its JSON result, `ready` counts filled, validated review rows; `pending` counts blank review rows; `applied` is always zero. These are review-queue counts, not whole-game completion metrics. Any failed row produces a nonzero exit status. After validation, replace `--dry-run` with `--output reviewed.jsonl` to import into a new file.
 
 [中文](README.zh.md) | English
 
@@ -39,7 +48,7 @@ Audit first, reuse safely, localize second. Give DeepSeek Harness a visual-novel
 ## Start in 30 seconds
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.8.1
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.9.0
 ```
 
 Restart DSH, then ask:
@@ -162,8 +171,8 @@ The registered name remains `galgame-localization-reverse`, so existing prompts 
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.8.1.tgz .\builds\v0.8.1
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.8.1.tgz -ChecksumsPath .\builds\v0.8.1\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.9.0.tgz .\builds\v0.9.0
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.9.0.tgz -ChecksumsPath .\builds\v0.9.0\SHA256SUMS
 ```
 
 The check runs provider tests plus deterministic self-tests for planning, script adapters, translation-memory migration, translation QA, and all bundled patch/asset utilities. Each release also publishes SHA-256 and CycloneDX SBOM evidence.
@@ -182,4 +191,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md) for contri
 
 [MIT](LICENSE)
 
-Compatibility: runtime-validated on DSH 0.1.2-rc.1. Upstream 0.1.3-alpha.1 is published on GitHub; its npm package was unavailable on 2026-09-06, so runtime compatibility with that alpha is not yet claimed.
+Compatibility: the previous full-host baseline is DSH 0.1.2-rc.1. On 2026-10-18, provider registration and skill loading passed against the real DSH 0.2.1-rc.2 skill registry and Cordis packages. This is a registry contract test, not a full Web UI or model-session test.

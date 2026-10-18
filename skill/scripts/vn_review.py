@@ -50,28 +50,35 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--current', required=True, help='Exact original current catalog used by migrate')
     parser.add_argument('--review-csv', required=True)
-    parser.add_argument('--output', required=True)
+    parser.add_argument('--output', help='New output catalog; required unless --dry-run is used')
+    parser.add_argument('--dry-run', action='store_true', help='Validate every row and print counts without writing a catalog')
     parser.add_argument('--encoding', help='Optional target encoding, e.g. cp932 or gbk')
     args = parser.parse_args()
+    if not args.dry_run and not args.output:
+        parser.error('--output is required unless --dry-run is used')
+    if args.dry_run and args.output:
+        parser.error('--dry-run does not accept --output')
     current = Path(args.current).resolve(strict=True)
     review = Path(args.review_csv).resolve(strict=True)
-    output = Path(args.output).resolve()
-    if output in {current, review} or output.exists():
+    output = Path(args.output).resolve() if args.output else None
+    if output is not None and (output in {current, review} or output.exists()):
         raise ValueError('output must be a new path distinct from inputs')
     digest = hashlib.sha256(current.read_bytes()).hexdigest()
     with review.open(encoding='utf-8-sig', newline='') as handle:
-        reader = csv.DictReader(handle)
+        reader = csv.DictReader(handle, strict=True)
         if len(reader.fieldnames or []) != len(set(reader.fieldnames or [])):
             raise ValueError('duplicate CSV column names')
         if not {'current_sha256', 'segment_id', 'reviewed_target'} <= set(reader.fieldnames or []):
             raise ValueError('missing required review CSV columns')
-        records, count = apply_review(_load_records(current), list(reader), digest, args.encoding)
-    _write_jsonl(output, records, force=False)
-    print(json.dumps({'schema': 'vn-review-import/v1', 'applied': count, 'current_sha256': digest, 'review_sha256': hashlib.sha256(review.read_bytes()).hexdigest()}))
+        rows = list(reader)
+        records, count = apply_review(_load_records(current), rows, digest, args.encoding)
+    if output is not None:
+        _write_jsonl(output, records, force=False)
+    print(json.dumps({'schema': 'vn-review-import/v1', 'dry_run': args.dry_run, 'applied': 0 if args.dry_run else count, 'ready': count, 'pending': len(rows) - count, 'review_rows': len(rows), 'catalog_records': len(records), 'current_sha256': digest, 'review_sha256': hashlib.sha256(review.read_bytes()).hexdigest()}))
 
 
 if __name__ == '__main__':
     try:
         main()
-    except (ValueError, OSError, LookupError) as error:
+    except (ValueError, OSError, LookupError, csv.Error) as error:
         raise SystemExit(f'ERROR: {error}')
