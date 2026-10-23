@@ -1,5 +1,7 @@
 # Galgame Doctor for DeepSeek Harness
 
+New in v0.9.1: review import errors identify the physical CSV record start line, including multiline records and blank lines. Encoding failures do not echo the translation. Provider registration and skill-body loading were also verified with DSH 0.2.1-rc.3.
+
 Preflight reviewed translations with --dry-run before importing: validate hashes, placeholders, encoding, and strict CSV syntax without writing a catalog.
 
 **Keep reviewed translations when a game updates. Catch broken control codes before shipping.**
@@ -48,7 +50,7 @@ Audit first, reuse safely, localize second. Give DeepSeek Harness a visual-novel
 ## Start in 30 seconds
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.9.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.9.1
 ```
 
 Restart DSH, then ask:
@@ -171,8 +173,8 @@ The registered name remains `galgame-localization-reverse`, so existing prompts 
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.9.0.tgz .\builds\v0.9.0
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.9.0.tgz -ChecksumsPath .\builds\v0.9.0\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.9.1.tgz .\builds\v0.9.1
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.9.1.tgz -ChecksumsPath .\builds\v0.9.1\SHA256SUMS
 ```
 
 The check runs provider tests plus deterministic self-tests for planning, script adapters, translation-memory migration, translation QA, and all bundled patch/asset utilities. Each release also publishes SHA-256 and CycloneDX SBOM evidence.

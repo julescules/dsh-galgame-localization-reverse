@@ -10,6 +10,16 @@ from vn_review import apply_review
 
 
 class ReviewTests(unittest.TestCase):
+    def test_error_points_to_physical_csv_line_without_echoing_target(self):
+        records = [{'segment_id': 'a', 'source': 'Hi {name}', 'target': ''}]
+        row = {'current_sha256': 'hash', 'segment_id': 'a', 'reviewed_target': 'PRIVATE_TRANSLATION'}
+        with self.assertRaisesRegex(ValueError, 'CSV row 7: placeholder mismatch: a') as result:
+            apply_review(records, [row], 'hash', row_numbers=[7])
+        self.assertNotIn('PRIVATE_TRANSLATION', str(result.exception))
+        row['reviewed_target'] = '你好 {name}'
+        with self.assertRaisesRegex(ValueError, 'CSV row 7: target cannot be encoded as ascii'):
+            apply_review(records, [row], 'hash', 'ascii', [7])
+
     def test_cli_preflight_and_import_preserve_sources(self):
         with tempfile.TemporaryDirectory(prefix='vn-review-') as folder:
             root = Path(folder)
@@ -40,6 +50,16 @@ class ReviewTests(unittest.TestCase):
             malformed = subprocess.run(command + ['--dry-run'], capture_output=True, text=True, encoding='utf-8')
             self.assertNotEqual(malformed.returncode, 0)
             self.assertNotIn('Traceback', malformed.stderr)
+            # A blank row followed by a quoted multiline field starts at line 3.
+            with review.open('w', encoding='utf-8-sig', newline='') as handle:
+                writer = csv.writer(handle)
+                writer.writerow(['current_sha256', 'segment_id', 'reviewed_target'])
+                writer.writerow([])
+                writer.writerow([digest, 'a', 'PRIVATE\nTRANSLATION'])
+            multiline = subprocess.run(command + ['--dry-run'], capture_output=True, text=True, encoding='utf-8')
+            self.assertNotEqual(multiline.returncode, 0)
+            self.assertIn('CSV row 3: placeholder mismatch', multiline.stderr)
+            self.assertNotIn('PRIVATE', multiline.stderr)
 
     def test_malformed_rows_are_rejected(self):
         records = [{'segment_id': 'a', 'source': 'Hi', 'target': ''}]

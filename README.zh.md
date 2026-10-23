@@ -1,5 +1,7 @@
 # DeepSeek Harness Galgame Doctor
 
+v0.9.1 更新：审核导入错误显示 CSV 记录起始行，支持多行字段和空行；编码错误不回显译文。另已验证 DSH 0.2.1-rc.3 下的技能注册与正文加载。
+
 本版更新：审核表支持 --dry-run 预检，先核对控制符、编码和哈希，再决定导入；严格拒绝损坏的 CSV 引号。
 
 
@@ -20,7 +22,7 @@ python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-cs
 
 `current.jsonl` 必须是迁移时原始 current 文件，不能换成 migrated 输出。导入器核对哈希、重复/未知段落、控制符和目标编码；所有行通过后才生成新文件，空白审核项保留待办。支持默认字段 `segment_id/source/target`。接着以 reviewed.jsonl 为 current 再做一次历史迁移，合并精确复用结果，最后运行严格 QA。
 
-安装本版：`dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.9.0`，然后重启 DSH。
+安装本版：`dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.9.1`，然后重启 DSH。
 
 
 ### 导入前预检
@@ -45,7 +47,7 @@ python -B -X utf8 skill/scripts/vn_review.py --current current.jsonl --review-cs
 ## 30 秒开始
 
 ```powershell
-dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.9.0
+dsh plugin --profile web add github:julescules/dsh-galgame-localization-reverse#v0.9.1
 ```
 
 重启 DSH，然后直接说：
@@ -168,8 +170,8 @@ python -X utf8 skill\scripts\vn_qa.py check-jsonl examples\translations.jsonl `
 ```powershell
 npm run check
 npm pack --dry-run
-node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.9.0.tgz .\builds\v0.9.0
-.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.9.0.tgz -ChecksumsPath .\builds\v0.9.0\SHA256SUMS
+node scripts/build-release-metadata.mjs .\dsh-galgame-localization-reverse-0.9.1.tgz .\builds\v0.9.1
+.\scripts\verify-release.ps1 -PackagePath .\dsh-galgame-localization-reverse-0.9.1.tgz -ChecksumsPath .\builds\v0.9.1\SHA256SUMS
 ```
 
 检查包含 Provider 测试，以及计划生成、脚本适配、翻译记忆迁移、翻译 QA 和全部补丁／资源工具的确定性自测。每个 Release 还会发布 SHA-256 与 CycloneDX SBOM 证据。
